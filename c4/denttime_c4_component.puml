@@ -1,0 +1,69 @@
+@startuml denttime_c4_component
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+
+title [Component Diagram] DentTime - ML Model Serving Subsystem\nCurrent: FastAPI + Docker  |  Future (Target): KServe + Triton on GKE
+
+' ===== External Containers =====
+Container_Ext(webApp, "UI / Web Application", "React / Next.js\n[NOT STARTED]", "Sends user-filled patient symptom data\nand receives Suggested Time Window.")
+
+ContainerDb_Ext(modelRegistry, "Model Registry", "Joblib + MLflow → ONNX (GCS)", "Stores versioned model artifacts:\n.pkl (current) / .onnx (future).\nNaming: denttime_xgb_v{M}.{m}_{YYYYMM}.pkl")
+
+System_Ext(gkeAutopilot, "GKE Autopilot (Future)", "Managed Kubernetes.\nProvides compute resources\nand Auto-scaling Infrastructure.")
+
+' ===== Current Implementation: FastAPI + Docker =====
+Container_Boundary(currentServing, "Model Serving / API — CURRENT [Partial]") {
+
+    Component(featurePrep, "Feature Preparation", "Python / Pandas", "Receives raw input fields:\ntreatment text, tooth_no,\ndoctor_license_no (anonymized),\ncheck_in_time context.\nMaps Treatment Class via Dictionary Mapping\n(RapidFuzz fallback for unseen text).\nLooks up Doctor Profile Stats from precomputed table\n(Global Median for cold-start: < 30 cases).\nOutputs: engineered feature vector.")
+
+    Component(predictionAPI, "Prediction API", "FastAPI + Docker", "REST endpoint: POST /predict\nReceives feature vector from Feature Preparation.\nCalls XGBoost model for inference.\nApplies post-processing:\n  - Ceiling to slot (conservative rounding up)\n  - Safety check (min slot guard)\nReturns: Duration Slot (15/30/45/60/75/90/105 min).\np99 Latency target: < 3s (current).")
+
+    Component(modelLoader_current, "Model Loader (Current)", "Joblib / Pickle", "Loads .pkl model artifact at startup.\nHolds model in memory for inference.\nManual swap required for model updates.\nFallback: loads Random Forest .pkl\nif XGBoost unavailable.")
+
+    Component(xgboostModel, "XGBoost Model", ".pkl / Joblib", "Primary model: XGBoost (multi-class, 7 classes).\nTrained on 10-month chronological split.\nFeatures: Treatment Class (one-hot/multi-hot),\nTooth Count, Tooth Scope, Composite Flag,\nTime of Day, Is First Case,\nDoctor Profile (median duration, case volume,\nspeed ratio).\nFallback: Random Forest .pkl.")
+
+    Component(doctorProfileStore, "Doctor Profile Lookup Table", "Python Dict / Parquet", "Precomputed aggregated statistics\nfrom Training Set only (prevent leakage):\n- doctor_median_duration_per_treatment\n- doctor_case_volume\n- doctor_speed_ratio\nCold-start: Global Median if < 30 cases.\nUpdated each Retrain cycle.")
+}
+
+' ===== Future Target Architecture: KServe + Triton =====
+Container_Boundary(futureServing, "Model Serving — FUTURE TARGET [Planned]") {
+
+    Component(istioGateway, "Istio Ingress Gateway", "Istio / Envoy [Future]", "Entry point for all ML Serving traffic.\nPerforms Load Balancing across pods.\nHandles TLS termination.")
+
+    Component(trafficRouter, "Traffic Router", "KServe Traffic Splitting [Future]", "Controls Canary Rollout:\nShadow phase → 10% Canary → 100% Production.\nRollback if performance degrades within 24h.")
+
+    Component(shadowServer, "Shadow Inference Server", "Triton (Shadow Mode) [Future]", "Runs new model candidate in background.\nMirrors Production requests for silent evaluation.\nDoes NOT return result to user.")
+
+    Component(tritonProd, "Triton Inference Server", "Triton + ONNX Runtime [Future]", "Serves Production ONNX Model.\nSupports Batching & Concurrency.\np99 Latency target: < 1s.\nHot-reload for zero-downtime model updates.")
+
+    Component(evalLogger, "Evaluation Logger", "Prometheus [Future]", "Compares Production vs Shadow predictions.\nTracks: Macro F1, Under-estimation Rate, MAE.\nDecides Promote / Rollback:\n- F1 drop > 5% → Rollback\n- PSI > 0.25 → Trigger Retrain alert.")
+
+    Component(autoScaler, "Auto-Scaler", "KServe KPA / K8s HPA [Future]", "Monitors RPS and pod resource usage.\nAuto scales replicas to maintain\np99 Latency < 1s.")
+}
+
+' ===== Relationships — Current Implementation =====
+Rel(webApp, predictionAPI, "POST /predict\n(treatment text, tooth_no,\ndoctor_id, time context)", "HTTPS / JSON")
+Rel(predictionAPI, featurePrep, "Passes raw input\nfor preprocessing", "Internal")
+Rel(featurePrep, doctorProfileStore, "Looks up Doctor\nProfile Stats", "In-memory dict")
+Rel(featurePrep, predictionAPI, "Returns engineered\nfeature vector", "Internal")
+Rel(predictionAPI, xgboostModel, "Runs inference on\nfeature vector", "Joblib in-memory call")
+Rel(xgboostModel, predictionAPI, "Returns predicted\nDuration Class", "Internal")
+Rel(modelLoader_current, xgboostModel, "Loads model at startup", "Joblib.load()")
+Rel(modelRegistry, modelLoader_current, "Manual: copy .pkl\nto server on update", "File / GCS download")
+Rel(predictionAPI, webApp, "Returns Suggested\nTime Window", "JSON Response")
+
+' ===== Relationships — Future Target =====
+Rel(webApp, istioGateway, "POST inference request\n(feature vector)", "HTTPS / gRPC [Future]")
+Rel(istioGateway, trafficRouter, "Forward request", "Internal gRPC")
+Rel(istioGateway, shadowServer, "Mirror request\n(Shadow Copy)", "gRPC")
+Rel(trafficRouter, tritonProd, "Route production traffic", "gRPC")
+Rel(tritonProd, webApp, "Returns prediction\n(Duration Slot)", "gRPC response")
+Rel(shadowServer, evalLogger, "Sends shadow predictions\nfor comparison", "Prometheus metrics")
+Rel(tritonProd, evalLogger, "Sends production predictions\nfor comparison", "Prometheus metrics")
+Rel(evalLogger, trafficRouter, "Controls Promote /\nRollback decision", "Internal API")
+Rel(modelRegistry, tritonProd, "Hot-reload ONNX model\nfrom GCS", "GCS API / Triton API")
+Rel(tritonProd, autoScaler, "Reports resource metrics", "K8s Metrics API")
+Rel(autoScaler, gkeAutopilot, "Requests compute resources", "GKE API")
+
+@enduml
