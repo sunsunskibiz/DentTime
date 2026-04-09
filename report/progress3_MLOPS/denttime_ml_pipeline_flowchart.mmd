@@ -20,7 +20,7 @@ flowchart TD
     subgraph DATA["① DATA"]
         direction TB
         D1[("🗄️ CMS Database MySQL / PostgreSQL Historical Appointments ~1M records / year")]
-        D2["🔍 SQL Query + CSV Export DBA access required"]
+        D2["🔍 SQL Query Airflow PostgresOperator / SQLAlchemy Connector Read Replica"]
         D3["🔐 SHA-256 Anonymization doctor_license_no hashing Airflow DAG"]
         D4["✅ Data Validation Schema · Missing rate Distribution check Great Expectations"]
         D5["🧹 Data Cleaning Missing Data · Fuzzy Match Dictionary Mapping · Outlier Removal Airflow"]
@@ -88,12 +88,12 @@ flowchart TD
     E2 -- "✅ Yes → promote" --> E3
     E2 -- "❌ No → investigate & tune" --> T3
     E3 --> E4
-    E3 --> DEP1
+    E3 -->|"v1: direct deploy"| DEP4
+    E3 -.->|"future: shadow path"| DEP1
     DEP1 --> DEP2
     DEP2 -- "✅ Pass" --> DEP3
     DEP2 -- "❌ Fail → rollback" --> E4
-    DEP3 --> DEP4
-    DEP4 --> DEP5
+    DEP3 -.->|"future: graduated rollout"| DEP4
     DEP4 --> DEP6
     DEP4 --> M1
     DEP6 --> M_DRIFT
@@ -110,17 +110,20 @@ flowchart TD
 
     %% 🟠 MANUAL
     class D2 manual
-    class T3,T4,T5,E1,E4 manual
-    class DEP4,DEP6 manual
-    class M1,M_PERF manual
+    class DEP4 manual
 
     %% 🔵 SEMI-AUTO
     class D3,D5,D6 semiauto
-    class T1,T2 semiauto
-    class E3 semiauto
+    class D7 semiauto
+    class T1,T2,T3 semiauto
+    class E3,E4 semiauto
+    class DEP6 semiauto
+    class M_PERF semiauto
 
     %% 🟢 AUTOMATIC
-    class D1,D7 automatic
+    class D1 automatic
+    class T5,E1 automatic
+    class M1 automatic
 
     %% ⚫ FUTURE
     class D4 future
