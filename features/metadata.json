@@ -12,7 +12,7 @@
   "near_zero_variance_excluded": ["receipt_issued"],
   "pk_excluded": ["appointment_pseudo_id"],
   "known_issues": {
-    "treatment_class_unknown_rate": "38.4% — treatment_dict.json covers only ~62% of treatment strings; dictionary expansion required before model training"
+    "treatment_class_unknown_rate": "14.4% (train) / 14.1% (test) — down from 38.4% after expanding treatment_dict.json from 15 to 22 categories with ~75 aliases; residual unknowns are rare/misspelled strings"
   },
   "duration_class_distribution_train": {
     "15": 58242,
