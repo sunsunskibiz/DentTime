@@ -1,0 +1,1177 @@
+{
+  "C_02a9ec8638904dec": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.11646586345381527,
+    "case_count": 249
+  },
+  "C_02ba55d9311af349": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.06557377049180328,
+    "case_count": 183
+  },
+  "C_03b552df1e854e70": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0933572710951526,
+    "case_count": 1114
+  },
+  "C_084423a5779f7de6": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.11666666666666667,
+    "case_count": 420
+  },
+  "C_08c39916c820ae60": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.03896103896103896,
+    "case_count": 1694
+  },
+  "C_0a1d0941d46686e2": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.30925925925925923,
+    "case_count": 540
+  },
+  "C_0b9a2119bbe50e89": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0984251968503937,
+    "case_count": 508
+  },
+  "C_0dc9c5297e59c06c": {
+    "clinic_median_duration": 10.0,
+    "clinic_pct_long": 0.043225270157938485,
+    "case_count": 1203
+  },
+  "C_0e7c4a4188793abe": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.17493897477624085,
+    "case_count": 1229
+  },
+  "C_0eebd9d7fb2810be": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.05333333333333334,
+    "case_count": 375
+  },
+  "C_102c36ee66640b33": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.108348134991119,
+    "case_count": 563
+  },
+  "C_110e54fc16b9b060": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.08547008547008547,
+    "case_count": 117
+  },
+  "C_1171fc7b2b3c8eb3": {
+    "clinic_median_duration": 45.0,
+    "clinic_pct_long": 0.49166666666666664,
+    "case_count": 120
+  },
+  "C_1311fa6997337e77": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 470
+  },
+  "C_1511048132f792a3": {
+    "clinic_median_duration": 45.0,
+    "clinic_pct_long": 0.053231939163498096,
+    "case_count": 789
+  },
+  "C_15d9a9a8d18629ae": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.14661654135338345,
+    "case_count": 266
+  },
+  "C_15e6ba337b89900f": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.04821213338690237,
+    "case_count": 2489
+  },
+  "C_17b73e7cfadbabcf": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.22,
+    "case_count": 200
+  },
+  "C_17da1184fc8c75a1": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.032148900169204735,
+    "case_count": 1182
+  },
+  "C_1ca0990a9f1b561a": {
+    "clinic_median_duration": 10.0,
+    "clinic_pct_long": 0.08967716221602232,
+    "case_count": 2509
+  },
+  "C_1d80e71f9f57b644": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.3492063492063492,
+    "case_count": 441
+  },
+  "C_1df9a3bd0c9eb6d9": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.06333333333333334,
+    "case_count": 300
+  },
+  "C_1e4d089ed1170894": {
+    "clinic_median_duration": 10.0,
+    "clinic_pct_long": 0.04678362573099415,
+    "case_count": 513
+  },
+  "C_1e6f7fd4785bd8dc": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.07262569832402235,
+    "case_count": 179
+  },
+  "C_1ee52e77e61e7a3a": {
+    "clinic_median_duration": 60.0,
+    "clinic_pct_long": 1.0,
+    "case_count": 129
+  },
+  "C_1eeb5a28542a1b03": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.1956521739130435,
+    "case_count": 368
+  },
+  "C_1f35d009660f6a7d": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.010845986984815618,
+    "case_count": 461
+  },
+  "C_1f7a35033bf953da": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.16453201970443349,
+    "case_count": 1015
+  },
+  "C_1fb39c13fd301e60": {
+    "clinic_median_duration": 20.0,
+    "clinic_pct_long": 0.07525423728813559,
+    "case_count": 1475
+  },
+  "C_2353abfefb6347bf": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.017543859649122806,
+    "case_count": 114
+  },
+  "C_248c59d11ee022bd": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.09006211180124224,
+    "case_count": 644
+  },
+  "C_24b9900dc0242763": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.02226027397260274,
+    "case_count": 584
+  },
+  "C_268d78d8cb98c8c5": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.000741839762611276,
+    "case_count": 2696
+  },
+  "C_26a24ec47cf9390f": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.024727272727272726,
+    "case_count": 1375
+  },
+  "C_2c881172de44df69": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.09868421052631579,
+    "case_count": 152
+  },
+  "C_2cd7f5284f7a425c": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.005722460658082976,
+    "case_count": 699
+  },
+  "C_2d211dc21e7f935e": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.1865671641791045,
+    "case_count": 134
+  },
+  "C_2ecef7656efa9033": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.12853470437017994,
+    "case_count": 389
+  },
+  "C_32f412fcc35c84b9": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.03917050691244239,
+    "case_count": 434
+  },
+  "C_33a0773a37901d90": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 106
+  },
+  "C_33ac527a17bf9d0e": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.36363636363636365,
+    "case_count": 33
+  },
+  "C_34d85cbd5a0dadd0": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.06997635933806147,
+    "case_count": 2115
+  },
+  "C_373a66e680010d19": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.06554307116104868,
+    "case_count": 1068
+  },
+  "C_382b16b3895299fe": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.0058997050147492625,
+    "case_count": 1356
+  },
+  "C_38dd631ebb8a5844": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.18261826182618263,
+    "case_count": 909
+  },
+  "C_399a6dbfdcd8173e": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.18181818181818182,
+    "case_count": 418
+  },
+  "C_3b424d07aaf38860": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.15695067264573992,
+    "case_count": 446
+  },
+  "C_3c840b390d83b6cd": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.2757475083056478,
+    "case_count": 301
+  },
+  "C_3ca96a77e5354e35": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0017421602787456446,
+    "case_count": 574
+  },
+  "C_3e2a86abeac90dbb": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 231
+  },
+  "C_3e2fc914b00a0a18": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.028400597907324365,
+    "case_count": 669
+  },
+  "C_3e6ca65bb4f1e75e": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0005198856251624642,
+    "case_count": 3847
+  },
+  "C_3e825003428c352b": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.05701754385964912,
+    "case_count": 456
+  },
+  "C_4236c103be55c94f": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.1484375,
+    "case_count": 512
+  },
+  "C_435fbee9b4c65365": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.14802631578947367,
+    "case_count": 304
+  },
+  "C_44fdbb2c63416f84": {
+    "clinic_median_duration": 20.0,
+    "clinic_pct_long": 0.11418685121107267,
+    "case_count": 578
+  },
+  "C_460a9fbcd448aabc": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.003134796238244514,
+    "case_count": 638
+  },
+  "C_475580592cf829d0": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.4895397489539749,
+    "case_count": 239
+  },
+  "C_48d1a537074b6175": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.005252100840336135,
+    "case_count": 952
+  },
+  "C_497511d35bc63784": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.17142857142857143,
+    "case_count": 105
+  },
+  "C_497d832b8892d200": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.3511111111111111,
+    "case_count": 450
+  },
+  "C_4b82aa2226b8a66e": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.1130841121495327,
+    "case_count": 1070
+  },
+  "C_4e09200a6a24338f": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.1076923076923077,
+    "case_count": 390
+  },
+  "C_4e85235611211d3b": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.17263843648208468,
+    "case_count": 307
+  },
+  "C_4f111b6f02b8f1bd": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.2903225806451613,
+    "case_count": 93
+  },
+  "C_50799f42ab6bcea8": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.07368421052631578,
+    "case_count": 95
+  },
+  "C_50b859e031518d08": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.08823529411764706,
+    "case_count": 884
+  },
+  "C_5192b7bcecf9ad00": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.16428571428571428,
+    "case_count": 700
+  },
+  "C_519af55002066d30": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.03481012658227848,
+    "case_count": 948
+  },
+  "C_54293cc2c0eeb837": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 1230
+  },
+  "C_54ac11d01cc6e4df": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.085219707057257,
+    "case_count": 751
+  },
+  "C_54fda016ef027d26": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.08437611726850197,
+    "case_count": 2797
+  },
+  "C_551deb9ed0f330c2": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.04868913857677903,
+    "case_count": 267
+  },
+  "C_5562f84ab550c17f": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.32955974842767294,
+    "case_count": 795
+  },
+  "C_55759cbad6f93596": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.046875,
+    "case_count": 192
+  },
+  "C_55ce7b3a680f09b5": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.13178294573643412,
+    "case_count": 129
+  },
+  "C_569376f21d64752b": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.03007518796992481,
+    "case_count": 133
+  },
+  "C_56cf41be242e9974": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.00423728813559322,
+    "case_count": 472
+  },
+  "C_5891181532daf144": {
+    "clinic_median_duration": 10.0,
+    "clinic_pct_long": 0.04923076923076923,
+    "case_count": 2275
+  },
+  "C_58dd563dbafc7938": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.04258150365934797,
+    "case_count": 3006
+  },
+  "C_5a85ed31c2f36d23": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 979
+  },
+  "C_5c2ca81d969747a9": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.050473186119873815,
+    "case_count": 317
+  },
+  "C_5c41eb135744462e": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.10409556313993173,
+    "case_count": 586
+  },
+  "C_609093806cf2f6b1": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 265
+  },
+  "C_62e70f741acc4c89": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.005405405405405406,
+    "case_count": 185
+  },
+  "C_64fc3d1763b78e1b": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.26143790849673204,
+    "case_count": 306
+  },
+  "C_65bf3db445f3ddef": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.08758314855875832,
+    "case_count": 1804
+  },
+  "C_65d154af248090b6": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.027777777777777776,
+    "case_count": 1260
+  },
+  "C_674e29abbe8f8fc2": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.125,
+    "case_count": 256
+  },
+  "C_6780d41f58a14647": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.08108108108108109,
+    "case_count": 555
+  },
+  "C_67907ba32c5c55ac": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.007162041181736795,
+    "case_count": 1117
+  },
+  "C_67e49a7c8ff80841": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.06454316848281642,
+    "case_count": 2386
+  },
+  "C_67e9040abc00f9a5": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.11677282377919321,
+    "case_count": 471
+  },
+  "C_6801d882e4d7942b": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.06845965770171149,
+    "case_count": 1227
+  },
+  "C_689caacdf55fa64e": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.04081632653061224,
+    "case_count": 686
+  },
+  "C_68d02d0ed9a2e26c": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.07058823529411765,
+    "case_count": 255
+  },
+  "C_695f5dea507e601b": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.033967391304347824,
+    "case_count": 736
+  },
+  "C_6c92853067158656": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.03474320241691843,
+    "case_count": 662
+  },
+  "C_6cd85278f623f980": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.15668202764976957,
+    "case_count": 217
+  },
+  "C_6cd8f2fb76b23b0c": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.006622516556291391,
+    "case_count": 604
+  },
+  "C_6d48e364ba1b1f7e": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.009746588693957114,
+    "case_count": 513
+  },
+  "C_6e53cb8031c39e0a": {
+    "clinic_median_duration": 60.0,
+    "clinic_pct_long": 0.9313077939233818,
+    "case_count": 757
+  },
+  "C_6ed79b84520c6cf4": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.009596928982725527,
+    "case_count": 521
+  },
+  "C_6f0bb904bd28e991": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.08895705521472393,
+    "case_count": 326
+  },
+  "C_6fe81746e98b715d": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 860
+  },
+  "C_7038083e0ede27b5": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 817
+  },
+  "C_70c972df2e44c0a9": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.01058574453069866,
+    "case_count": 1417
+  },
+  "C_719198be7f81c28b": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.15811088295687886,
+    "case_count": 487
+  },
+  "C_71d07fa678a0c074": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.20425531914893616,
+    "case_count": 235
+  },
+  "C_727ec40d57b3633e": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.13934426229508196,
+    "case_count": 366
+  },
+  "C_7680a0ada2d02672": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 86
+  },
+  "C_7bc5c3359916fdf2": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.028925619834710745,
+    "case_count": 242
+  },
+  "C_7d70d4e31975055d": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.012879484820607176,
+    "case_count": 1087
+  },
+  "C_7dd203bf9d50ef49": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 229
+  },
+  "C_7e472bedbe20d0c2": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.16551724137931034,
+    "case_count": 290
+  },
+  "C_7fb3cc83ef4e233f": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.04119601328903655,
+    "case_count": 1505
+  },
+  "C_7fc7c187e9eda5e2": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 401
+  },
+  "C_8251961925d48ad5": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.11358574610244988,
+    "case_count": 449
+  },
+  "C_83afe67a435d288f": {
+    "clinic_median_duration": 45.0,
+    "clinic_pct_long": 0.4993252361673414,
+    "case_count": 741
+  },
+  "C_84e7d693cc974ff5": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.05157593123209169,
+    "case_count": 349
+  },
+  "C_889341a0aac26d52": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.044642857142857144,
+    "case_count": 112
+  },
+  "C_892dba38d74bf745": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.2010178117048346,
+    "case_count": 393
+  },
+  "C_8c58168c70e16a16": {
+    "clinic_median_duration": 20.0,
+    "clinic_pct_long": 0.01762114537444934,
+    "case_count": 454
+  },
+  "C_8c8b9b0661b7147c": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.055162659123055166,
+    "case_count": 1414
+  },
+  "C_8e33d7d662c07b6c": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.2887323943661972,
+    "case_count": 142
+  },
+  "C_8e66335bd9f28900": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.02389937106918239,
+    "case_count": 1590
+  },
+  "C_8ed22abc100f3265": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.03619909502262444,
+    "case_count": 221
+  },
+  "C_8f612fd383bb8cec": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 217
+  },
+  "C_8fd340500f5d3920": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.16723549488054607,
+    "case_count": 293
+  },
+  "C_90dbad120aa8dbaf": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.18456375838926176,
+    "case_count": 596
+  },
+  "C_91057d170a93e134": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.2255700325732899,
+    "case_count": 1228
+  },
+  "C_92f3c0d47209ea01": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 432
+  },
+  "C_93543af9f5fc6bc7": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.1326923076923077,
+    "case_count": 520
+  },
+  "C_95814b5c4b1671db": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.08428246013667426,
+    "case_count": 439
+  },
+  "C_963127f7d5957935": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.005917159763313609,
+    "case_count": 507
+  },
+  "C_974195cf8ab642bf": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.06367583212735166,
+    "case_count": 691
+  },
+  "C_97b0924dd52dedc2": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0984182776801406,
+    "case_count": 569
+  },
+  "C_9bb52aa75f38be5e": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 1550
+  },
+  "C_9c68a31da2a6a3ff": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.1306179775280899,
+    "case_count": 1424
+  },
+  "C_9cab20bf77c4bd62": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 450
+  },
+  "C_9ce8742baabefbad": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.05678537054860443,
+    "case_count": 1039
+  },
+  "C_9d1d14d3b50279c7": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.09903381642512077,
+    "case_count": 414
+  },
+  "C_9e779b1a73e4c3f5": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.08390022675736962,
+    "case_count": 441
+  },
+  "C_a1398217fd31e47b": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.09203980099502487,
+    "case_count": 402
+  },
+  "C_a411efb6bb0bec56": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.13970588235294118,
+    "case_count": 136
+  },
+  "C_a5b6c6a7591aca19": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.16981132075471697,
+    "case_count": 265
+  },
+  "C_a75e44eb46814959": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.038288288288288286,
+    "case_count": 444
+  },
+  "C_ac4f84b662d91d2b": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.16785714285714284,
+    "case_count": 280
+  },
+  "C_aeb1e7b0752dec95": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.03821656050955414,
+    "case_count": 314
+  },
+  "C_af22dbbbd30738cc": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.04716981132075472,
+    "case_count": 212
+  },
+  "C_af94458a031c3b15": {
+    "clinic_median_duration": 10.0,
+    "clinic_pct_long": 0.015188979159307664,
+    "case_count": 2831
+  },
+  "C_b02d07c30366b92e": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 1284
+  },
+  "C_b05e3e171328257b": {
+    "clinic_median_duration": 10.0,
+    "clinic_pct_long": 0.026360067302299495,
+    "case_count": 1783
+  },
+  "C_b0a2cfc81f50f39a": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.12121212121212122,
+    "case_count": 66
+  },
+  "C_b0ea50634e3dd21c": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.1349206349206349,
+    "case_count": 126
+  },
+  "C_b1217ab1c782c024": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.31004366812227074,
+    "case_count": 229
+  },
+  "C_b26cb612afdbd7b1": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.07408993576017131,
+    "case_count": 2335
+  },
+  "C_b36cb85205314bf7": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.028310502283105023,
+    "case_count": 1095
+  },
+  "C_b3bd7591dbac6764": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 613
+  },
+  "C_b4b6b6bbeae1505d": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.23149394347240915,
+    "case_count": 743
+  },
+  "C_b8dd075c2e382b99": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.06727574750830564,
+    "case_count": 1204
+  },
+  "C_b8e4c14b224860e1": {
+    "clinic_median_duration": 10.0,
+    "clinic_pct_long": 0.04257425742574258,
+    "case_count": 1010
+  },
+  "C_b981426682dc4cb1": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.09635274904735983,
+    "case_count": 1837
+  },
+  "C_bade94db77075e69": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.09821428571428571,
+    "case_count": 784
+  },
+  "C_bb2442182c3f3d24": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.005943536404160475,
+    "case_count": 673
+  },
+  "C_bb375567dd8fab2e": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.06801470588235294,
+    "case_count": 544
+  },
+  "C_bda5b0831db004d8": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.051094890510948905,
+    "case_count": 137
+  },
+  "C_bed7dd14fb3bc5e4": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0997352162400706,
+    "case_count": 1133
+  },
+  "C_c0a59969478bbe2c": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.3519736842105263,
+    "case_count": 304
+  },
+  "C_c20685a4a6eb5a62": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.08872581721147432,
+    "case_count": 1499
+  },
+  "C_c40478e695b8f84a": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.1619718309859155,
+    "case_count": 568
+  },
+  "C_c4492c174ba50cd0": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.12483311081441922,
+    "case_count": 1498
+  },
+  "C_c6b934abc422afeb": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0012674271229404308,
+    "case_count": 789
+  },
+  "C_c6eb39e74b42a738": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.08021390374331551,
+    "case_count": 374
+  },
+  "C_c7921f1a611039b4": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.12280701754385964,
+    "case_count": 171
+  },
+  "C_c821bfc4a6db24a7": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 297
+  },
+  "C_c8ed1c94fa310654": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.1595744680851064,
+    "case_count": 282
+  },
+  "C_ca1f454e71aed75d": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.01569713758079409,
+    "case_count": 1083
+  },
+  "C_ca3afdf3abe5cc15": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.24016010673782523,
+    "case_count": 1499
+  },
+  "C_cae069c3ea387778": {
+    "clinic_median_duration": 22.5,
+    "clinic_pct_long": 0.017094017094017096,
+    "case_count": 234
+  },
+  "C_cc22b1c4cb538ed8": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.02012072434607646,
+    "case_count": 497
+  },
+  "C_cd48910156c687db": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.03776223776223776,
+    "case_count": 715
+  },
+  "C_ce1e220375f016d3": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.08651911468812877,
+    "case_count": 497
+  },
+  "C_cf64bbbd9064689f": {
+    "clinic_median_duration": 60.0,
+    "clinic_pct_long": 0.7393617021276596,
+    "case_count": 188
+  },
+  "C_d041bc4d99952412": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.11851851851851852,
+    "case_count": 135
+  },
+  "C_d0743220dec99ecb": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.15070643642072212,
+    "case_count": 637
+  },
+  "C_d1a2088dde9e0a0b": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.15756302521008403,
+    "case_count": 476
+  },
+  "C_d22b447a810f7933": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.04033379694019471,
+    "case_count": 719
+  },
+  "C_d3866d01bd29b8d6": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.10414788097385032,
+    "case_count": 2218
+  },
+  "C_d46bb36af40bf4b4": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.218436873747495,
+    "case_count": 499
+  },
+  "C_d65e06c79d263549": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.13562091503267973,
+    "case_count": 612
+  },
+  "C_d66e591c87d87db6": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.07131782945736434,
+    "case_count": 1290
+  },
+  "C_d6ccc6586d870d9d": {
+    "clinic_median_duration": 60.0,
+    "clinic_pct_long": 0.9923076923076923,
+    "case_count": 260
+  },
+  "C_d72360a5ea3c3c93": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0880952380952381,
+    "case_count": 420
+  },
+  "C_d771f76a33b2be04": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 299
+  },
+  "C_d82ba9efb879b286": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.013719512195121951,
+    "case_count": 656
+  },
+  "C_d8d4555a04bf56d5": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.23255813953488372,
+    "case_count": 301
+  },
+  "C_d9622e5d95891250": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 47
+  },
+  "C_d9a6cf9b2ba8828c": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.21703296703296704,
+    "case_count": 364
+  },
+  "C_db2781d27e97bf54": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.23948220064724918,
+    "case_count": 618
+  },
+  "C_dea7209c3bb23c0a": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.06607275426874536,
+    "case_count": 1347
+  },
+  "C_e000fe9a91ab428c": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 35
+  },
+  "C_e0e05c61c962f176": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.066006600660066,
+    "case_count": 303
+  },
+  "C_e1824a1a04e70838": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.328332371609925,
+    "case_count": 1733
+  },
+  "C_e3c780ca0be65fa9": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.19083969465648856,
+    "case_count": 1179
+  },
+  "C_e52159838b617399": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.09785522788203753,
+    "case_count": 746
+  },
+  "C_e5a6b4b96f6ee056": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.039354187689202826,
+    "case_count": 991
+  },
+  "C_e61dcb9f21d24652": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.23809523809523808,
+    "case_count": 714
+  },
+  "C_e802e7831eaacd97": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.1787709497206704,
+    "case_count": 179
+  },
+  "C_e86d92b75f98b14d": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.11956521739130435,
+    "case_count": 552
+  },
+  "C_e8ae2a0ef28c96dd": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.037914691943127965,
+    "case_count": 211
+  },
+  "C_e8ced2eda84f6d1d": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.03942652329749104,
+    "case_count": 837
+  },
+  "C_e8d760f88ca73985": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.1710914454277286,
+    "case_count": 339
+  },
+  "C_e925df72bb1ebdad": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.0375,
+    "case_count": 1040
+  },
+  "C_ea5994ea0c137f71": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 30
+  },
+  "C_ea9e7cbe077bf273": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 383
+  },
+  "C_eb447881b66ad6af": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.12035398230088495,
+    "case_count": 565
+  },
+  "C_ec57551ed07dd04c": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.4459203036053131,
+    "case_count": 527
+  },
+  "C_ed0ce514e9ba3ed7": {
+    "clinic_median_duration": 10.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 3725
+  },
+  "C_edc3ac1baa7e7156": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.13364928909952606,
+    "case_count": 1055
+  },
+  "C_ef8c28e178f52cf0": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.23404255319148937,
+    "case_count": 658
+  },
+  "C_f05cbd88d9e23ca0": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.13393870601589103,
+    "case_count": 881
+  },
+  "C_f098b567ddfea3e4": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.16635514018691588,
+    "case_count": 535
+  },
+  "C_f24c2ea416ab3f2c": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.05357142857142857,
+    "case_count": 392
+  },
+  "C_f273a814c04592bf": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.16233766233766234,
+    "case_count": 308
+  },
+  "C_f2cefc32531fbeca": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.04602510460251046,
+    "case_count": 717
+  },
+  "C_f411aa6e48fc735d": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.10263157894736842,
+    "case_count": 760
+  },
+  "C_f4a1ae2ceec96240": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.015625,
+    "case_count": 128
+  },
+  "C_f5e57339a9fb70e1": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 543
+  },
+  "C_f7710f1b2bd89ce5": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 161
+  },
+  "C_f8ffff58f56fed1a": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0038461538461538464,
+    "case_count": 260
+  },
+  "C_fbd9087d270f3ffc": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 208
+  },
+  "C_fd92d099935946eb": {
+    "clinic_median_duration": 15.0,
+    "clinic_pct_long": 0.0,
+    "case_count": 79
+  },
+  "C_fe27b12c902c9fe8": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.1016548463356974,
+    "case_count": 1269
+  },
+  "__global__": {
+    "clinic_median_duration": 30.0,
+    "clinic_pct_long": 0.08853334291032938,
+    "case_count": 167067
+  }
+}
