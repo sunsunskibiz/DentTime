@@ -1,0 +1,5 @@
+outs:
+- md5: a5dbf12aad96bf6bf61f6b930d9d9e94
+  size: 1777
+  hash: md5
+  path: feature_stats.json
