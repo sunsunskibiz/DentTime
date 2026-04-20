@@ -194,7 +194,7 @@ def test_treatment_class_value_in_valid_range(transformer):
     # SAMPLE_TREATMENT_DICT has 4 classes → valid integers are 0, 1, 2, 3
     df = _make_df([_base_row(treatment="ขูดหินปูน")])  # SCALING → 2
     result = transformer.transform(df)
-    assert result["treatment_class"].iloc[0] in {0, 1, 2, 3}
+    assert result["treatment_class"].iloc[0] == 2  # SCALING sorts alphabetically to index 2
 
 
 def test_treatment_class_encoding_is_stable(transformer):

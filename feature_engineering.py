@@ -15,6 +15,7 @@ import pandas as pd
 from src.features.build_profiles import build_and_save
 from src.features.feature_transformer import (
     FeatureTransformer,
+    LEAKAGE_COLUMNS,
     build_treatment_encoding,
     load_treatment_dict,
 )
@@ -50,8 +51,7 @@ def main():
         raise ValueError("Test split is empty — check appt_year_month column and date range")
 
     # Drop post-visit leakage columns before any further processing
-    LEAKAGE_COLS = ["checkin_delay_min", "tx_record_offset_min", "receipt_offset_min"]
-    leakage_present = [c for c in LEAKAGE_COLS if c in train_df.columns]
+    leakage_present = [c for c in LEAKAGE_COLUMNS if c in train_df.columns]
     if leakage_present:
         logging.info(f"Dropping post-visit leakage columns: {leakage_present}")
         train_df = train_df.drop(columns=leakage_present)
