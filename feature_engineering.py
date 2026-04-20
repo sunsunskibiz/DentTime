@@ -13,7 +13,11 @@ from pathlib import Path
 import pandas as pd
 
 from src.features.build_profiles import build_and_save
-from src.features.feature_transformer import FeatureTransformer
+from src.features.feature_transformer import (
+    FeatureTransformer,
+    build_treatment_encoding,
+    load_treatment_dict,
+)
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
@@ -58,10 +62,19 @@ def main():
     build_and_save(train_df, ARTIFACTS_DIR)
     logging.info(f"Profiles written to {ARTIFACTS_DIR}/")
 
+    # Build deterministic treatment encoding from dict keys (no train-data dependency)
+    treatment_dict = load_treatment_dict(str(ARTIFACTS_DIR / "treatment_dict.json"))
+    encoding = build_treatment_encoding(treatment_dict)
+    encoding_path = ARTIFACTS_DIR / "treatment_encoding.json"
+    with open(encoding_path, "w", encoding="utf-8") as f:
+        json.dump(encoding, f, indent=2, sort_keys=True)
+    logging.info(f"Treatment encoding written to {encoding_path} ({len(encoding)} classes)")
+
     transformer = FeatureTransformer(
         doctor_profile_path=str(ARTIFACTS_DIR / "doctor_profile.json"),
         clinic_profile_path=str(ARTIFACTS_DIR / "clinic_profile.json"),
         treatment_dict_path=str(ARTIFACTS_DIR / "treatment_dict.json"),
+        treatment_encoding_path=str(encoding_path),
     )
 
     logging.info("Transforming train split...")
@@ -80,13 +93,15 @@ def main():
     stats = {}
     for col in train_features.columns:
         col_stats: dict = {"null_rate": float(train_features[col].isna().mean())}
-        if train_features[col].dtype == object:
+        if col == "treatment_class":
+            unknown_int = encoding["UNKNOWN"]
+            col_stats["unknown_rate"] = float(
+                (train_features[col] == unknown_int).sum() / len(train_features)
+            )
+            col_stats["mean"] = float(train_features[col].mean())
+        elif train_features[col].dtype == object:
             top5 = train_features[col].value_counts().head(5).to_dict()
             col_stats["top5"] = {str(k): int(v) for k, v in top5.items()}
-            if col == "treatment_class":
-                col_stats["unknown_rate"] = float(
-                    (train_features[col] == "UNKNOWN").sum() / len(train_features)
-                )
         else:
             col_stats["mean"] = float(train_features[col].mean())
             if col == "appt_hour_bucket":
