@@ -8,6 +8,12 @@ import pandas as pd
 from .treatment_mapper import build_reverse_map, load_treatment_dict, map_treatment
 from .tooth_parser import parse_tooth_no
 
+
+def build_treatment_encoding(treatment_dict: dict) -> dict:
+    """Deterministic str→int encoding: sorted dict keys → 0…N-1."""
+    return {cls: i for i, cls in enumerate(sorted(treatment_dict.keys()))}
+
+
 LEAKAGE_COLUMNS = {"checkin_delay_min", "tx_record_offset_min", "receipt_offset_min"}
 
 FEATURE_COLUMNS = [
