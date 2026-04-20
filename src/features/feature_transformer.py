@@ -52,6 +52,7 @@ class FeatureTransformer:
         doctor_profile_path: str,
         clinic_profile_path: str,
         treatment_dict_path: str,
+        treatment_encoding_path: str,
     ):
         with open(doctor_profile_path, encoding="utf-8") as f:
             self._doctor_profile = json.load(f)
@@ -59,6 +60,8 @@ class FeatureTransformer:
             self._clinic_profile = json.load(f)
         self._treatment_dict = load_treatment_dict(treatment_dict_path)
         self._reverse_map = build_reverse_map(self._treatment_dict)
+        with open(treatment_encoding_path, encoding="utf-8") as f:
+            self._treatment_encoding: dict = json.load(f)
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         # Step 1: Leakage guard
@@ -144,5 +147,12 @@ class FeatureTransformer:
         missing = set(final_cols) - set(out.columns)
         if missing:
             raise ValueError(f"BUG: transformer failed to produce columns: {missing}")
+
+        # Step 10: Encode treatment_class string → integer (tree-model ready)
+        out["treatment_class"] = out["treatment_class"].map(self._treatment_encoding)
+        assert out["treatment_class"].notna().all(), (
+            "BUG: treatment_class encoding produced NaN — "
+            "treatment_encoding.json must cover all classes output by treatment_mapper"
+        )
 
         return out[final_cols]
