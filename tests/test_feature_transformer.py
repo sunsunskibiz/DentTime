@@ -39,6 +39,11 @@ def artifact_dir(tmp_path):
     (tmp_path / "clinic_profile.json").write_text(
         json.dumps(SAMPLE_CLINIC_PROFILE), encoding="utf-8"
     )
+    from src.features.feature_transformer import build_treatment_encoding
+    encoding = build_treatment_encoding(SAMPLE_TREATMENT_DICT)
+    (tmp_path / "treatment_encoding.json").write_text(
+        json.dumps(encoding), encoding="utf-8"
+    )
     return tmp_path
 
 
@@ -48,6 +53,7 @@ def transformer(artifact_dir):
         doctor_profile_path=str(artifact_dir / "doctor_profile.json"),
         clinic_profile_path=str(artifact_dir / "clinic_profile.json"),
         treatment_dict_path=str(artifact_dir / "treatment_dict.json"),
+        treatment_encoding_path=str(artifact_dir / "treatment_encoding.json"),
     )
 
 
@@ -169,3 +175,30 @@ def test_surface_count_comma_separated(transformer):
     df = _make_df([_base_row(surfaces="4,5")])
     result = transformer.transform(df)
     assert result["surface_count"].iloc[0] == 2
+
+
+def test_no_string_columns_in_output(transformer):
+    df = _make_df([_base_row()])
+    result = transformer.transform(df)
+    string_cols = [c for c in result.columns if result[c].dtype == object]
+    assert string_cols == [], f"String columns found: {string_cols}"
+
+
+def test_treatment_class_dtype_is_int64(transformer):
+    df = _make_df([_base_row()])
+    result = transformer.transform(df)
+    assert str(result["treatment_class"].dtype) == "int64"
+
+
+def test_treatment_class_value_in_valid_range(transformer):
+    # SAMPLE_TREATMENT_DICT has 4 classes → valid integers are 0, 1, 2, 3
+    df = _make_df([_base_row(treatment="ขูดหินปูน")])  # SCALING → 2
+    result = transformer.transform(df)
+    assert result["treatment_class"].iloc[0] in {0, 1, 2, 3}
+
+
+def test_treatment_class_encoding_is_stable(transformer):
+    df = _make_df([_base_row(treatment="ขูดหินปูน")])
+    result1 = transformer.transform(df.copy())
+    result2 = transformer.transform(df.copy())
+    assert result1["treatment_class"].iloc[0] == result2["treatment_class"].iloc[0]
