@@ -2,17 +2,17 @@
   "treatment_class": {
     "null_rate": 0.0,
     "top5": {
-      "UNKNOWN": 64092,
-      "ORTHO_ADJUST": 36861,
-      "SCALING": 12826,
-      "EXTRACTION": 8932,
-      "COMPOSITE_FILL": 8385
+      "ORTHO_ADJUST": 38152,
+      "UNKNOWN": 24168,
+      "SCALING": 13445,
+      "COMPOSITE_FILL": 12940,
+      "STERILIZATION_FEE": 10393
     },
-    "unknown_rate": 0.3836305194921798
+    "unknown_rate": 0.1446605254179461
   },
   "composite_treatment_flag": {
     "null_rate": 0.0,
-    "mean": 0.05018944495322236
+    "mean": 0.07745395559865204
   },
   "has_tooth_no": {
     "null_rate": 0.0,
