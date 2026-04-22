@@ -8,6 +8,7 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
     AIRFLOW__CORE__FERNET_KEY: ''
+    AIRFLOW__WEBSERVER__SECRET_KEY: 'denttime-local-dev-secret'
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
   volumes:
@@ -37,18 +38,14 @@ services:
 
   airflow-init:
     <<: *airflow-common
-    command: >
-      bash -c "
-        airflow db migrate &&
-        (airflow users list | grep -q admin || airflow users create
-          --username admin
-          --password admin
-          --role Admin
-          --email admin@example.com
-          --firstname Admin
-          --lastname Admin) &&
-        (cd /opt/airflow/project && dvc remote add -d localremote /opt/airflow/dvc-store --local --force || echo 'DVC remote setup skipped')
-      "
+    user: root
+    command:
+      - bash
+      - -c
+      - |
+          set -e
+          chown -R 50000:0 /opt/airflow/data/interim /opt/airflow/dvc-store
+          su -s /bin/bash airflow -c 'set -e; airflow db migrate; airflow users list | grep -q admin || airflow users create --username admin --password admin --role Admin --email admin@example.com --firstname Admin --lastname Admin; cd /opt/airflow/project && (dvc remote add -d localremote /opt/airflow/dvc-store --local --force || echo "DVC remote setup skipped")'
     restart: "no"
 
   airflow-webserver:

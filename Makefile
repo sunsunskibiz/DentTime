@@ -7,12 +7,10 @@ dvc-commit:
 	        src/features/artifacts/doctor_profile.json \
 	        src/features/artifacts/clinic_profile.json \
 	        src/features/artifacts/treatment_encoding.json
-	dvc push
 	git add features/*.dvc \
 	        src/features/artifacts/doctor_profile.json.dvc \
 	        src/features/artifacts/clinic_profile.json.dvc \
-	        src/features/artifacts/treatment_encoding.json.dvc \
-	        .gitignore
+	        src/features/artifacts/treatment_encoding.json.dvc
 	@echo ""
-	@echo "DVC push complete. Now run:"
+	@echo "DVC files staged. Now run:"
 	@echo "  git commit -m 'feat: update features $(shell date +%Y-%m-%d)'"
