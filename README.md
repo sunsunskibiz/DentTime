@@ -91,14 +91,23 @@ See [docs/runbook-airflow-pipeline.md](docs/runbook-airflow-pipeline.md) for sel
 
 ## Task Graph
 
-```
-task_load_and_split
-  ├── task_build_doctor_profile
-  ├── task_build_clinic_profile
-  └── task_build_treatment_encoding
-        ├── task_transform_train
-        └── task_transform_test
-              └── task_compute_feature_stats
+```mermaid
+graph LR
+    A[task_load_and_split] --> B[task_build_treatment_encoding]
+    A --> C[task_build_doctor_profile]
+    A --> D[task_build_clinic_profile]
+    
+    B --> E[task_transform_train]
+    B --> F[task_transform_test]
+    
+    C --> E
+    C --> F
+    
+    D --> E
+    D --> F
+    
+    E --> G[task_compute_feature_stats]
+    F --> G
 ```
 
 All inter-task communication is via files on shared volumes — no Airflow XCom.
