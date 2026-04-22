@@ -10,6 +10,9 @@ The pipeline takes raw appointment data, engineers features (doctor profiles, cl
 
 ```
 DentTime/
+├── data/
+│   └── raw/                      # Anonymized input data (git-ignored, not committed)
+│       └── data.csv              # ← place file here before running
 ├── feature_engineering.py        # Standalone script (no Docker needed)
 ├── src/features/                 # Feature engineering modules
 │   ├── build_profiles.py         # Doctor & clinic profile builders
@@ -40,15 +43,17 @@ DentTime/
 
 ## Data
 
-Raw data is produced by a separate, access-controlled pipeline maintained by [@natchyunicorn](https://github.com/natchyunicorn). Place the anonymized output at `data/raw/data.csv` before running the pipeline. Contact the data owner for access.
+Raw data is produced by a separate, access-controlled pipeline maintained by [@natchyunicorn](https://github.com/natchyunicorn). For full details on the data collection pipeline, please refer to the upstream repository: [https://github.com/natchyunicorn/denttime.git](https://github.com/natchyunicorn/denttime.git). 
+
+Place the anonymized output at `data/raw/data.csv` before running the pipeline. Contact the data owner for access.
 
 This repo contains no patient data and no PII — only the anonymized CSV (excluded from git via `.gitignore`) and the ML pipeline that consumes it.
 
 ---
 
-## Quick Start — Standalone Script
+## Feature Engineering Quick Start — Standalone Script
 
-No Docker required. Runs the full pipeline in one shot.
+No Docker required. Runs the full feature engineering pipeline in one shot.
 
 ```bash
 pip install -r requirements-fe.txt
@@ -57,9 +62,9 @@ python feature_engineering.py --input "data/raw/data.csv" --output features/
 
 ---
 
-## Full Pipeline — Airflow + Docker
+## Feature Engineering Pipeline — Airflow + Docker
 
-Runs the same logic as 7 independent tasks. Each task can be rerun individually without re-running the whole pipeline (e.g., rebuild only the doctor profile after new data arrives).
+Runs the same logic as 7 independent tasks. Each task can be rerun individually without re-running the whole feature engineering pipeline (e.g., rebuild only the doctor profile after new data arrives).
 
 **Prerequisites:** Docker Desktop with ≥ 6 GB RAM allocated.
 
