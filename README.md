@@ -40,7 +40,7 @@ DentTime/
 
 ## Data
 
-Raw data is produced by a separate, access-controlled pipeline maintained by [@natchyunicorn](https://github.com/natchyunicorn). Place the anonymized output at `Data Collection/data.csv` before running the pipeline. Contact the data owner for access.
+Raw data is produced by a separate, access-controlled pipeline maintained by [@natchyunicorn](https://github.com/natchyunicorn). Place the anonymized output at `data/raw/data.csv` before running the pipeline. Contact the data owner for access.
 
 This repo contains no patient data and no PII — only the anonymized CSV (excluded from git via `.gitignore`) and the ML pipeline that consumes it.
 
@@ -52,7 +52,7 @@ No Docker required. Runs the full pipeline in one shot.
 
 ```bash
 pip install -r requirements-fe.txt
-python feature_engineering.py --input "Data Collection/data.csv" --output features/
+python feature_engineering.py --input "data/raw/data.csv" --output features/
 ```
 
 ---

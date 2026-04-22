@@ -14,7 +14,7 @@ x-airflow-common: &airflow-common
   volumes:
     - ../:/opt/airflow/project
     - ../airflow/dags:/opt/airflow/dags
-    - "../Data Collection:/opt/airflow/data/raw:ro"
+    - "../data/raw:/opt/airflow/data/raw:ro"
     - denttime-interim:/opt/airflow/data/interim
     - denttime-dvc-store:/opt/airflow/dvc-store
   depends_on:

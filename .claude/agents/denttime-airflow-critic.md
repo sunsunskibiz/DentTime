@@ -25,7 +25,7 @@ Given: a git diff and a section's acceptance criteria from
 - Must define exactly 3 named volumes: `postgres-db`, `denttime-interim`, `denttime-dvc-store`
 - Must define exactly 3 bind mounts:
   - `../` → `/opt/airflow/project` (rw)
-  - `../Data Collection` → `/opt/airflow/data/raw` (ro)
+  - `../data/raw` → `/opt/airflow/data/raw` (ro)
   - `../airflow/dags` → `/opt/airflow/dags` (rw)
 - `airflow-init` command must include `dvc remote add -d localremote /opt/airflow/dvc-store --local --force`
 - Must use `LocalExecutor`

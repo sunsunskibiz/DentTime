@@ -4,7 +4,7 @@
 
 - Docker Desktop running with ≥ 6 GB RAM allocated
 - Project cloned at any path (all mounts are relative to `docker/`)
-- Raw data CSV at `Data Collection/data.csv` (relative to project root)
+- Raw data CSV at `data/raw/data.csv` (relative to project root)
 
 ---
 
@@ -156,7 +156,7 @@ DVC only updates `.gitignore` on first `dvc add`. Subsequent runs leave it uncha
 The `Data Collection/` directory is bind-mounted read-only. Verify the file exists on the host:
 
 ```bash
-ls "Data Collection/data.csv"
+ls "data/raw/data.csv"
 ```
 
 ---

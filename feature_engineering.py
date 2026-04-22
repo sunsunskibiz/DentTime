@@ -2,7 +2,7 @@
 Feature engineering pipeline for DentTime.
 
 Usage:
-    python feature_engineering.py --input "Data Collection/data.csv" --output features/
+    python feature_engineering.py --input "data/raw/data.csv" --output features/
 """
 
 import argparse
