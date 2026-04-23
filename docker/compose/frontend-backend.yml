@@ -1,6 +1,8 @@
 services:
   backend:
-    build: ./backend
+    build:
+      context: ../..
+      dockerfile: docker/Dockerfile.backend
     container_name: denttime_backend
     ports:
       - "8000:8000"
@@ -10,7 +12,9 @@ services:
       - MODEL_STAGE=Production
 
   frontend:
-    build: ./frontend
+    build:
+      context: ../..
+      dockerfile: docker/Dockerfile.frontend
     container_name: denttime_frontend
     ports:
       - "5173:5173"

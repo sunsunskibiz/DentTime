@@ -38,7 +38,7 @@ const PIPELINE_STEPS: Array<{
   {
     icon: "🚀",
     title: "FastAPI Serving",
-    description: `REST endpoint\np99 < 1s`,
+    description: `REST endpoint\np99 < 1s(Future: KServe)`,
     iconBackgroundColor: "#0e7da1",
   },
 ];
@@ -86,7 +86,6 @@ const MLPipeline: FunctionComponent<MLPipelineProps> = ({ className = "" }) => {
                 className="relative text-[length:inherit] font-normal mq450:text-base"
                 aria-hidden="true"
               >
-                →
               </span>
             )}
           </div>

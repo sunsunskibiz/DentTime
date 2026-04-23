@@ -16,7 +16,7 @@ const FEATURE_ITEMS: FeatureItem[] = [
     icon: "\u23F1",
     title: "Accurate Duration Prediction",
     description:
-      "XGBoost classifies treatment into 7 time slots (15\u2013105 min) based on treatment type, tooth count, and doctor profile \u2014 trained on 1M+ real records.",
+      "XGBoost classifies treatment into 6 time slots (15-105 min) based on treatment type, tooth count, and doctor profile. trained on 1M+ real records.",
   },
   {
     icon: "\uD83D\uDCC9",
@@ -50,7 +50,7 @@ const Features: FunctionComponent<FeaturesProps> = ({ className = "" }) => {
           Why DentTime?
         </h2>
         <p className="relative text-base text-[#708599] !m-0">
-          Built for dental clinics \u2014 designed around real scheduling challenges.
+          Built for dental clinics. designed around real scheduling challenges.
         </p>
       </div>
       <div className="self-stretch overflow-hidden flex items-start justify-center flex-wrap content-start gap-6 text-left text-[22px] text-[#0e2538] font-[Inter]">

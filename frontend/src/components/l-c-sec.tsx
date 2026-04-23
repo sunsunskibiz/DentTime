@@ -65,10 +65,10 @@ const LIFECYCLE_STAGES: LifecycleStage[] = [
   },
   {
     step: 5,
-    title: "Model Deployment",
+    title: "Model Serving & Application",
     description:
       "Export .pkl → FastAPI + Docker → ONNX (planned for KServe)",
-    automationLabel: "Partial (FastAPI)",
+    automationLabel: "Integrated (FastAPI)",
     automationLevel: "Partial",
     badgeBgClass: "bg-[#fff5de]",
     badgeTextClass: "text-[#bf800d]",
@@ -79,10 +79,10 @@ const LIFECYCLE_STAGES: LifecycleStage[] = [
     title: "Monitoring & Feedback",
     description:
       "Latency, drift detection (PSI, MMD), automated retrain triggers",
-    automationLabel: "Not started",
-    automationLevel: "Not started",
-    badgeBgClass: "bg-[#e0edfa]",
-    badgeTextClass: "text-[#708599]",
+    automationLabel: "Monitored (Prometheus + Grafana)",
+    automationLevel: "Partial",
+    badgeBgClass: "bg-[#fff5de]",
+    badgeTextClass: "text-[#bf800d]",
     rowBgClass: "bg-[#f0faff]",
   },
 ];

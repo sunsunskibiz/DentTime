@@ -45,7 +45,7 @@ const Hero: FunctionComponent<HeroProps> = ({
         </h1>
 
         <p className="!m-0 relative text-[17px] leading-[160%] text-[#708599] shrink-0">
-          DentTime predicts the right treatment duration \u2014 15 to 105 minutes \u2014
+          DentTime predicts the right treatment duration from 15 to 105 minutes
           so clinic staff can book smarter appointments, reduce patient wait
           times, and keep dentists on schedule.
         </p>
@@ -56,7 +56,7 @@ const Hero: FunctionComponent<HeroProps> = ({
             onClick={onTryPredictor}
             className="rounded-lg bg-[#0e7da1] overflow-hidden flex items-center justify-center !pt-3.5 !pb-3.5 !pl-8 !pr-8 text-[#fff] cursor-pointer border-0 hover:bg-[#0b6a8a] transition-colors"
           >
-            <span className="relative font-semibold">Try the Predictor \u2192</span>
+            <span className="relative font-semibold">Try the Predictor</span>
           </button>
           <button
             type="button"

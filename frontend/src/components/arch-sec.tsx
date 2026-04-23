@@ -69,7 +69,7 @@ const ArchSec: FunctionComponent<ArchSecProps> = ({ className = "" }) => {
           id="arch-sec-heading"
           className="!m-0 relative text-4xl font-extrabold font-[inherit] text-[#0e2538] mq450:text-[22px] mq1050:text-[29px]"
         >
-          How Predictions are Served
+          How Predictions are Served (Future State)
         </h2>
         <p className="!m-0 relative text-base text-[#708599]">
           The inference pipeline delivers real-time predictions through a
