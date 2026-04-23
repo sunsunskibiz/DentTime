@@ -1,141 +1,137 @@
-# DentTime
+# DentTime – ML-Enabled Dental Appointment Duration Prediction with Monitoring & Alerting
 
-Dental appointment no-show prediction — SE for ML term project.
+DentTime is a machine learning–enabled software system for predicting dental appointment duration and monitoring model behavior in production.
 
-The pipeline takes raw appointment data, engineers features (doctor profiles, clinic profiles, treatment encoding), and outputs train/test parquet files ready for model training. Two execution modes are supported: a standalone script for quick local runs, and an Apache Airflow DAG inside Docker Compose for reproducible, observable, step-by-step reruns.
+This repository integrates:
+- a **FastAPI** prediction service
+- a **React + Vite** frontend
+- **SQLite** for prediction logging
+- **Prometheus** for metrics collection and alert evaluation
+- **Grafana** for monitoring dashboards
+- a **metrics updater** job that computes drift and performance signals from persisted predictions
 
----
-
-## Project Structure
-
-```
-DentTime/
-├── data/
-│   └── raw/                      # Anonymized input data (git-ignored, not committed)
-│       └── data.csv              # ← place file here before running
-├── feature_engineering.py        # Standalone script (no Docker needed)
-├── src/features/                 # Feature engineering modules
-│   ├── build_profiles.py         # Doctor & clinic profile builders
-│   ├── feature_transformer.py    # FeatureTransformer + encoding
-│   ├── treatment_mapper.py
-│   └── tooth_parser.py
-├── airflow/dags/
-│   └── feature_engineering_dag.py  # 7-task Airflow DAG
-├── docker/
-│   ├── Dockerfile.airflow
-│   └── docker-compose.yml
-├── features/                     # Pipeline outputs (DVC-tracked)
-│   ├── features_train.parquet
-│   ├── features_test.parquet
-│   └── feature_stats.json
-├── src/features/artifacts/       # Fitted artifacts (DVC-tracked)
-│   ├── doctor_profile.json
-│   ├── clinic_profile.json
-│   └── treatment_encoding.json
-├── tests/                        # Unit + DAG structure tests
-├── Makefile                      # dvc-commit target
-└── docs/
-    ├── runbook-airflow-pipeline.md  # Operations guide
-    └── ADR-001-airflow-feature-pipeline.md
-```
+The system is designed as an end-to-end ML software system, covering **inference, logging, monitoring, alerting, and basic post-deployment evaluation**.
 
 ---
 
-## Data
+## 1) Problem Statement
 
-Raw data is produced by a separate, access-controlled pipeline maintained by [@natchyunicorn](https://github.com/natchyunicorn). For full details on the data collection pipeline, please refer to the upstream repository: [https://github.com/natchyunicorn/denttime.git](https://github.com/natchyunicorn/denttime.git). 
+Dental clinics need a practical way to estimate appointment duration so they can:
+- reduce over-booking and under-booking
+- improve patient wait time
+- support safer scheduling decisions
+- monitor whether model quality degrades after deployment
 
-Place the anonymized output at `data/raw/data.csv` before running the pipeline. Contact the data owner for access.
-
-This repo contains no patient data and no PII — only the anonymized CSV (excluded from git via `.gitignore`) and the ML pipeline that consumes it.
-
----
-
-## Feature Engineering Quick Start — Standalone Script
-
-No Docker required. Runs the full feature engineering pipeline in one shot.
-
-```bash
-pip install -r requirements-fe.txt
-python feature_engineering.py --input "data/raw/data.csv" --output features/
-```
+DentTime predicts appointment duration in minutes and then monitors:
+- **input data quality**
+- **feature drift**
+- **prediction distribution**
+- **performance degradation**
+- **under-estimation risk**
 
 ---
 
-## Feature Engineering Pipeline — Airflow + Docker
+## 2) Main Features
 
-Runs the same logic as 7 independent tasks. Each task can be rerun individually without re-running the whole feature engineering pipeline (e.g., rebuild only the doctor profile after new data arrives).
+### Prediction Service
+- Predict appointment duration from treatment-related inputs
+- Return predicted duration in **minutes**
+- Return model metadata and inference confidence
 
-**Prerequisites:** Docker Desktop with ≥ 6 GB RAM allocated.
+### Frontend
+- Landing page and prediction UI
+- Sends live requests to the FastAPI backend
+- Displays prediction result to the user
 
-```bash
-# 1. Start
-cd docker/
-docker compose up --build -d   # first run ~3–5 min
+### Monitoring
+- Prometheus scrapes `/metrics`
+- Grafana visualizes:
+  - MAE (minutes)
+  - Input Missing Rate
+  - Logged Predictions (Persisted)
+  - Feature Drift (PSI)
+  - Prediction Class Ratio
+  - Macro F1 vs Baseline
+  - Under-estimation Rate vs Baseline
 
-# 2. Open UI: http://localhost:8080  (admin / admin)
-#    DAGs → denttime_feature_engineering → ▶ Trigger DAG
+### Alerting
+Prometheus alert rules are defined for:
+- `DentTimeFeatureDriftHigh`
+- `DentTimeMacroF1Drop`
+- `DentTimeUnderEstimationHigh`
+- `DentTimeMissingRateHigh`
 
-# 3. After all 7 tasks turn green — version the outputs
-cd ..
-make dvc-commit
-git commit -m "feat: update features $(date +%Y-%m-%d)"
-
-# 4. Stop
-cd docker/ && docker compose down
-```
-
-See [docs/runbook-airflow-pipeline.md](docs/runbook-airflow-pipeline.md) for selective reruns, troubleshooting, and the full operations guide.
-
----
-
-## Task Graph
-
-```mermaid
-graph LR
-    A[task_load_and_split] --> B[task_build_treatment_encoding]
-    A --> C[task_build_doctor_profile]
-    A --> D[task_build_clinic_profile]
-    
-    B --> E[task_transform_train]
-    B --> F[task_transform_test]
-    
-    C --> E
-    C --> F
-    
-    D --> E
-    D --> F
-    
-    E --> G[task_compute_feature_stats]
-    F --> G
-```
-
-All inter-task communication is via files on shared volumes — no Airflow XCom.
+### Persistence
+- Predictions are stored in SQLite (`data/denttime.db`)
+- Actual outcomes can be logged back through `/actual`
+- Monitoring metrics are recomputed from persisted data
 
 ---
 
-## Tests
+## 3) Tech Stack
 
-```bash
-pip install -r requirements-fe.txt
-pytest tests/ -v
-```
+### Backend
+- FastAPI
+- Pydantic
+- pandas
+- NumPy
+- scikit-learn
+- XGBoost
+- joblib
+- SQLite
+- prometheus-client
 
-DAG structure tests (`tests/dags/`) use Python's `ast` module and require no Airflow installation.
+### Frontend
+- React
+- TypeScript
+- Vite
+- Chakra UI
+
+### Monitoring / Deployment
+- Docker Compose
+- Prometheus
+- Grafana
 
 ---
 
-## Data Versioning
+## 4) Project Structure
 
-Outputs are tracked with DVC. To restore the last committed feature set:
-
-```bash
-dvc checkout
-```
-
-To version new outputs after a pipeline run:
-
-```bash
-make dvc-commit
-git commit -m "feat: update features $(date +%Y-%m-%d)"
-```
+```text
+Final-term-project-main/
+├─ app/
+│  ├─ db.py
+│  ├─ main.py
+│  └─ schemas.py
+├─ artifacts/
+│  ├─ baseline_metrics.json
+│  ├─ feature_columns.json
+│  ├─ feature_stats.json
+│  ├─ model.joblib
+│  └─ smoke_test_inputs.json
+├─ data/
+│  ├─ denttime.db
+│  └─ reference/
+│     └─ reference_features.parquet
+├─ frontend/
+│  ├─ Dockerfile
+│  ├─ package.json
+│  └─ src/
+├─ grafana/
+│  ├─ dashboards/
+│  │  └─ denttime-monitoring.json
+│  └─ provisioning/
+├─ monitoring/
+│  ├─ state.json
+│  └─ update_metrics.py
+├─ prometheus/
+│  ├─ alerts.yml
+│  └─ prometheus.yml
+├─ src/features/
+│  ├─ build_profiles.py
+│  ├─ feature_transformer.py
+│  ├─ tooth_parser.py
+│  └─ treatment_mapper.py
+├─ docker-compose.yml
+├─ requirements.txt
+├─ run_metrics_loop.py
+└─ smoke_test_integration.py

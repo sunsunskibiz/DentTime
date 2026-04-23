@@ -1,5 +1,0 @@
-outs:
-- md5: 224efefea3a80cf475dd5fce9eaed5ff
-  size: 615840
-  hash: md5
-  path: features_test.parquet
