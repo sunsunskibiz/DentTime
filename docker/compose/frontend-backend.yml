@@ -6,10 +6,6 @@ services:
     container_name: denttime_backend
     ports:
       - "8000:8000"
-    environment:
-      - MLFLOW_TRACKING_URI=http://host.docker.internal:5000
-      - MODEL_NAME=DentTimeModel
-      - MODEL_STAGE=Production
 
   frontend:
     build:

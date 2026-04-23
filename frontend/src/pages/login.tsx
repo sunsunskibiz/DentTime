@@ -1,4 +1,4 @@
-import { type FunctionComponent, useState, useCallback } from "react";
+import { type FunctionComponent, useState, useCallback, type SyntheticEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Login: FunctionComponent = () => {
@@ -9,7 +9,7 @@ const Login: FunctionComponent = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
+    (e: SyntheticEvent<HTMLFormElement>) => {
       e.preventDefault();
       setError("");
       setIsLoading(true);

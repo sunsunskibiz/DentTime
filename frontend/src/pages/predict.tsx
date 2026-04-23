@@ -6,7 +6,7 @@ import type { PredictFormData } from "../components/left-column";
 
 type PredictionResult = {
   predicted_duration_class: number;
-  confidence?: number;
+  confidence?: number[];
   status: string;
   unit: string;
   model_version: string;
@@ -46,7 +46,7 @@ const Predict: FunctionComponent = () => {
         setPredictionResult({
           status: "error",
           predicted_duration_class: 0,
-          confidence: 0,
+          confidence: [],
           unit: "",
           model_version: "",
           timestamp: "",
@@ -66,7 +66,7 @@ const Predict: FunctionComponent = () => {
       setPredictionResult({
         status: "error",
         predicted_duration_class: 0,
-        confidence: 0,
+        confidence: [],
         unit: "",
         model_version: "",
         timestamp: "",
@@ -104,7 +104,7 @@ const Predict: FunctionComponent = () => {
         className="self-stretch bg-[#f0faff] overflow-hidden flex items-start !pt-12 !pb-16 !pl-20 !pr-20 gap-8 mq725:gap-4 mq725:!pt-[31px] mq725:!pb-[42px] mq725:!pl-10 mq725:!pr-10 mq725:box-border"
       >
         <LeftColumn onPredict={handlePredict} isLoading={isLoading} />
-        <RightColumn result={predictionResult} isLoading={isLoading} />
+        <RightColumn className="basis-2/7" result={predictionResult} isLoading={isLoading} />
       </main>
 
       <footer className="self-stretch bg-[#0e2538] overflow-hidden flex items-center justify-between !pt-7 !pb-7 !pl-20 !pr-20 box-border gap-5 max-w-full text-left text-sm text-[#fff] font-[Inter] mq725:flex-wrap mq725:gap-5 mq725:!pl-10 mq725:!pr-10 mq725:box-border">
@@ -112,7 +112,7 @@ const Predict: FunctionComponent = () => {
           DentTime &mdash; AI-Powered Smart Dentist Scheduling
         </span>
         <span className="relative text-[13px] text-[#708599]">
-          SE for ML Project &middot; 2025
+          SE for ML Project &middot; 2025 &middot; Team Two to one
         </span>
       </footer>
     </div>

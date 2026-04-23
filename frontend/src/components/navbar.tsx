@@ -5,7 +5,7 @@ export interface NavbarProps {
 }
 
 const NAV_LINKS = [
-  { label: "Home", href: "/" },
+  { label: "Home", href: "/home" },
   { label: "Predict", href: "/predict" },
   { label: "How It Works", href: "/how-it-works" },
   { label: "About", href: "/about" },
@@ -22,7 +22,7 @@ const Navbar: FunctionComponent<NavbarProps> = ({ className = "" }) => {
     >
       {/* Logo */}
       <a
-        href="/"
+        href="/home"
         className="overflow-hidden flex items-center !pt-5 !pb-5 !pl-0 !pr-0 gap-2.5 mq750:hidden no-underline"
         aria-label="DentTime home"
       >

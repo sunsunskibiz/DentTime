@@ -2,7 +2,7 @@ import { type FunctionComponent } from "react";
 
 type PredictionResult = {
   predicted_duration_class: number;
-  confidence?: number;
+  confidence?: number[];
   status: string;
   unit: string;
   model_version: string;
@@ -16,19 +16,19 @@ export type RightColumnType = {
   isLoading?: boolean;
 };
 
-interface StatCard {
-  label: string;
-  value: string;
-}
+// interface StatCard {
+//   label: string;
+//   value: string;
+// }
 
-const STAT_CARDS: StatCard[] = [
-  { label: "Treatment Class", value: "Scaling — Class 3" },
-  { label: "Tooth Count", value: "3 teeth" },
-  { label: "Doctor Speed", value: "1.08× avg" },
-  { label: "Latency", value: "< 0.3s" },
-];
+// const STAT_CARDS: StatCard[] = [
+//   { label: "Treatment Class", value: "Scaling — Class 3" },
+//   { label: "Tooth Count", value: "3 teeth" },
+//   { label: "Doctor Speed", value: "1.08× avg" },
+//   { label: "Latency", value: "< 0.3s" },
+// ];
 
-const PROBABILITY_SLOTS = [15, 30, 45, 60, 75, 90, 105] as const;
+const PROBABILITY_SLOTS = [15, 30, 45, 60, 90, 105] as const;
 
 /**
  * Prediction result panel showing XGBoost model output:
@@ -45,10 +45,8 @@ const RightColumn: FunctionComponent<RightColumnType> = ({
       ? result.predicted_duration_class
       : "--";
 
-  const confidence =
-    !isLoading && result?.confidence != null
-      ? result.confidence
-      : 0;
+  const confidenceArray = !isLoading && result?.confidence ? result.confidence : [];
+  const modelConfidence = confidenceArray.length > 0 ? Math.max(...confidenceArray) : 0;
 
   const status = isLoading ? "loading" : result?.status ?? "Not predicted yet";
   return (
@@ -97,19 +95,19 @@ const RightColumn: FunctionComponent<RightColumnType> = ({
         <div className="self-stretch overflow-hidden flex flex-col items-start gap-2">
           <div className="self-stretch overflow-hidden flex items-center justify-between gap-0">
             <span className="relative font-medium shrink-0">Model Confidence</span>
-            <b className="relative text-sm text-[#fff] shrink-0">{confidence}%</b>
+            <b className="relative text-sm text-[#fff] shrink-0">{modelConfidence.toFixed(1)}%</b>
           </div>
           <div
             role="progressbar"
-            aria-valuenow={confidence}
+            aria-valuenow={modelConfidence}
             aria-valuemin={0}
             aria-valuemax={100}
-            aria-label={`Model confidence ${confidence}%`}
+            aria-label={`Model confidence ${modelConfidence}%`}
             className="self-stretch h-1.5 rounded bg-[rgba(14,37,56,0.25)] overflow-hidden shrink-0 flex flex-col items-start"
           >
             <div
               className="h-1.5 rounded bg-[#fff] overflow-hidden shrink-0 flex flex-col items-start"
-              style={{ width: `${confidence}%` }}
+              style={{ width: `${modelConfidence}%` }}
             />
           </div>
         </div>
@@ -137,27 +135,30 @@ const RightColumn: FunctionComponent<RightColumnType> = ({
             aria-label="Probability distribution chart"
             className="self-stretch overflow-hidden flex items-end gap-1.5 shrink-0 text-[10px]"
           >
-            {PROBABILITY_SLOTS.map((slot) => (
-              <div
-                key={slot}
-                className="flex-1 overflow-hidden flex flex-col items-center justify-end gap-1"
-              >
+            {PROBABILITY_SLOTS.map((slot, index) => {
+              const maxConf = confidenceArray.length > 0 ? Math.max(...confidenceArray) : 1;
+              const conf = confidenceArray[index] || 0;
+              const height = slot === predictedMinutes ? 52 : Math.max(4, (conf / maxConf) * 52);
+              const bgColor = slot === predictedMinutes ? "bg-[#fff]" : "bg-[#b8e8f5]";
+              return (
                 <div
-                  className={`self-stretch rounded-[3px] overflow-hidden shrink-0 flex flex-col items-start ${
-                    slot === predictedMinutes
-                      ? "h-[52px] bg-[#fff]"
-                      : "h-1 bg-[#b8e8f5]"
-                  }`}
-                />
-                <span className="relative shrink-0">{slot}</span>
-              </div>
-            ))}
+                  key={slot}
+                  className="flex-1 overflow-hidden flex flex-col items-center justify-end gap-1"
+                >
+                  <div
+                    className={`self-stretch rounded-[3px] overflow-hidden shrink-0 flex flex-col items-start ${bgColor}`}
+                    style={{ height: `${height}px` }}
+                  />
+                  <span className="relative shrink-0">{slot}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
 
       {/* Stat cards row */}
-      <div
+      {/* <div
         aria-label="Prediction statistics"
         className="self-stretch overflow-hidden flex items-start gap-3 text-[11px] text-[#708599]"
       >
@@ -172,10 +173,10 @@ const RightColumn: FunctionComponent<RightColumnType> = ({
             </span>
           </div>
         ))}
-      </div>
+      </div> */}
 
       {/* Under-estimation guard warning */}
-      <div
+      {/* <div
         role="alert"
         className="self-stretch rounded-[10px] bg-[#fff2de] border-[#d9730d] border-solid border-[1px] overflow-hidden flex items-start !pt-3 !pb-3 !pl-[15px] !pr-[15px] text-[#d9730d]"
       >
@@ -188,7 +189,7 @@ const RightColumn: FunctionComponent<RightColumnType> = ({
             time risk.
           </p>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
