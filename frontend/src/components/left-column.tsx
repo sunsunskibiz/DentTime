@@ -10,15 +10,16 @@ export interface PredictFormData {
   treatmentSymptoms: string;
   toothNumbers: string;
   surfaces: string;
-  timeOfDay: string;
-  dayOfWeek: string;
-  appointmentRankInDay?: number;
+  selectedDateTime: string;
+  totalAmount?: number;
   doctorId?: string;
   clinicId: string;
-  isFirstCase: boolean;
   notes?: string;
 }
-
+interface Treatment {
+  id: string;
+  treatment: string;
+}
 interface Doctor {
   id: string;
   doctor: string;
@@ -30,6 +31,7 @@ interface Clinic {
 interface PredictOptions {
   doctors: Doctor[];
   clinics: Clinic[];
+  treatments: Treatment[];
 }
 
 const MAX_TOOTH_TAGS = 32;
@@ -51,12 +53,18 @@ const LeftColumn: FunctionComponent<LeftColumnType> = ({
   const [surfaces, setSurfaces] = useState<string>("");
   const [surfaceInput, setSurfaceInput] = useState("");
   const [surfaceInputError, setSurfaceInputError] = useState("");
-  const [isFirstCase, setIsFirstCase] = useState(false);
-  const [treatment, setTreatment] = useState("");
-  const [timeOfDay, setTimeOfDay] = useState("0");
-  const [dayOfWeek, setDayOfWeek] = useState("0");
-  const [appointmentRankInDay, setAppointmentRankInDay] = useState<number | undefined>();
-  const [appointmentRankError, setAppointmentRankError] = useState("");
+
+  // Treatment: now multi-select tags
+  const [selectedTreatments, setSelectedTreatments] = useState<Treatment[]>([]);
+  const [treatmentSearch, setTreatmentSearch] = useState("");
+  const [isTreatmentMenuOpen, setIsTreatmentMenuOpen] = useState(false);
+
+  const [selectedDateTime, setSelectedDateTime] = useState(() => {
+    const now = new Date();
+    return now.toISOString().slice(0, 16);
+  });
+  const [totalAmount, setTotalAmount] = useState<number>(0);
+  const [totalAmountError, setTotalAmountError] = useState("");
   const [doctorId, setDoctorId] = useState("");
   const [doctorSearch, setDoctorSearch] = useState("");
   const [doctorInputError, setDoctorInputError] = useState("");
@@ -66,7 +74,6 @@ const LeftColumn: FunctionComponent<LeftColumnType> = ({
   const [clinicSearch, setClinicSearch] = useState("");
   const [isClinicMenuOpen, setIsClinicMenuOpen] = useState(false);
   const [notes, setNotes] = useState("");
-  // const hasInvalidCount = toothNumbers.length === 0;
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_URL}/options`)
@@ -75,13 +82,9 @@ const LeftColumn: FunctionComponent<LeftColumnType> = ({
         setPredictOption({
           doctors: data.doctors,
           clinics: data.clinics,
+          treatments: data.treatments,
         });
       });
-
-  }, []);
-
-  const handleToggle = useCallback(() => {
-    setIsFirstCase((prev) => !prev);
   }, []);
 
   const handleSubmit = useCallback(
@@ -95,26 +98,47 @@ const LeftColumn: FunctionComponent<LeftColumnType> = ({
         return;
       }
 
-      if (appointmentRankError) {
+      if (totalAmountError) {
         return;
       }
 
       setDoctorInputError("");
       onPredict?.({
-        treatmentSymptoms: treatment,
+        treatmentSymptoms: selectedTreatments.map((t) => t.treatment).join(", "),
         toothNumbers: toothNumbers.trim() || "none",
         surfaces: surfaces.trim() || "none",
-        timeOfDay,
-        dayOfWeek,
-        appointmentRankInDay,
+        selectedDateTime,
+        totalAmount,
         doctorId: effectiveDoctorId || undefined,
         clinicId,
-        isFirstCase,
         notes,
       });
     },
-    [treatment, toothNumbers, surfaces, timeOfDay, dayOfWeek, appointmentRankInDay, dayOfWeek, appointmentRankInDay, doctorId, clinicId, isNewDoctor, doctorSearch, isFirstCase, notes, onPredict]
+    [selectedTreatments, toothNumbers, surfaces, selectedDateTime, totalAmount, doctorId, clinicId, isNewDoctor, doctorSearch, notes, onPredict]
   );
+
+  // Treatment tag helpers
+  const addTreatment = useCallback((treatment: Treatment) => {
+    setSelectedTreatments((prev) => {
+      if (prev.find((t) => t.id === treatment.id)) return prev;
+      return [...prev, treatment];
+    });
+    setTreatmentSearch("");
+    setIsTreatmentMenuOpen(false);
+  }, []);
+
+  const removeTreatment = useCallback((id: string) => {
+    setSelectedTreatments((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+
+  const filteredTreatments = useMemo(() => {
+    const allTreatments = predictOption?.treatments || [];
+    const query = treatmentSearch.trim().toLowerCase();
+    const selectedIds = new Set(selectedTreatments.map((t) => t.id));
+    return allTreatments.filter(
+      (t) => !selectedIds.has(t.id) && (!query || t.treatment.toLowerCase().includes(query))
+    );
+  }, [predictOption?.treatments, treatmentSearch, selectedTreatments]);
 
   const addToothNumber = useCallback((rawValue: string) => {
     const cleaned = rawValue.trim();
@@ -211,18 +235,18 @@ const LeftColumn: FunctionComponent<LeftColumnType> = ({
     <form
       aria-label="Patient and treatment details"
       onSubmit={handleSubmit}
-      className={`!m-0 flex-1 shadow-[0px_4px_20px_rgba(14,_37,_56,_0.05)] rounded-2xl bg-[#fff] border-[#e0edfa] border-solid border-[1px] overflow-hidden flex flex-col items-start !pt-[30px] !pb-[30px] !pl-[31px] !pr-[31px] gap-5 mq725:!pt-5 mq725:!pb-5 mq725:box-border ${className}`}
+      className={`!m-0 flex-1 shadow-[0px_4px_20px_rgba(14,_37,_56,_0.05)] rounded-2xl bg-[#fff] border-[#e0edfa] border-solid border-[1px] overflow-visible flex flex-col items-start !pt-[30px] !pb-[30px] !pl-[31px] !pr-[31px] gap-5 mq725:!pt-5 mq725:!pb-5 mq725:box-border ${className}`}
     >
       {/* Header row */}
       <div className="self-stretch overflow-hidden flex items-center justify-between gap-5 mq725:flex-wrap mq725:gap-5">
         <b className="relative text-lg font-[Inter] text-[#0e2538] text-left">
           Patient &amp; Treatment Details
         </b>
-        <div className="rounded-[20px] bg-[#def7fc] overflow-hidden flex items-center justify-center !pt-[5px] !pb-[5px] !pl-3 !pr-3">
+        {/* <div className="rounded-[20px] bg-[#def7fc] overflow-hidden flex items-center justify-center !pt-[5px] !pb-[5px] !pl-3 !pr-3">
           <span className="relative text-xs font-medium font-[Inter] text-[#0e7da1] text-left">
             Step 1 of 1
           </span>
-        </div>
+        </div> */}
       </div>
 
       {/* Divider */}
@@ -231,41 +255,99 @@ const LeftColumn: FunctionComponent<LeftColumnType> = ({
         className="self-stretch h-px bg-[#e0edfa] overflow-hidden shrink-0 flex flex-col items-start"
       />
 
-      {/* Treatment / Symptoms textarea */}
-      <div className="self-stretch overflow-hidden flex flex-col items-start gap-1.5">
-        <label
-          htmlFor="treatment"
-          className="relative text-[13px] font-medium font-[Inter] text-[#0e2538] text-left"
-        >
-          Treatment / Symptoms
-        </label>
-        <textarea
-          id="treatment"
-          value={treatment}
-          onChange={(e) => setTreatment(e.target.value)}
-          placeholder="Describe the treatment or symptoms (optional)..."
-          aria-label="Treatment description"
-          className="self-stretch rounded-lg bg-[#fff] border-[#e0edfa] border-solid border-[1px] overflow-hidden !p-3 text-sm font-[Inter] text-[#708599] text-left outline-none focus:border-[#0e7da1] transition-colors resize-none min-h-[100px]"
-        />
-      </div>
+      {/* Treatment multi-tag selector + Notes textareas row */}
+      <div className="self-stretch flex items-start gap-4 mq725:flex-wrap">
+        {/* Treatment multi-tag selector */}
+        <div className="flex-1 flex flex-col items-start gap-1.5 min-w-[337px] mq725:min-w-full relative">
+          <label
+            htmlFor="treatment-search"
+            className="relative text-[13px] font-medium font-[Inter] text-[#0e2538] text-left"
+          >
+            Treatment / Symptoms
+          </label>
+          <div className="self-stretch rounded-lg bg-[#fff] border-[#e0edfa] border-solid border-[1px] !p-2 flex flex-col gap-0 focus-within:border-[#0e7da1] transition-colors">
+            {/* Selected tags */}
+            {selectedTreatments.length > 0 && (
+              <div className="flex flex-wrap gap-2 !mb-1">
+                {selectedTreatments.map((t) => (
+                  <span
+                    key={t.id}
+                    className="inline-flex items-center gap-1 rounded-full bg-[#def7fc] text-[#0e7da1] text-xs font-medium font-[Inter] !pl-2.5 !pr-2 !pt-1 !pb-1"
+                  >
+                    {t.treatment}
+                    <button
+                      type="button"
+                      aria-label={`Remove treatment ${t.treatment}`}
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => removeTreatment(t.id)}
+                      className="border-0 bg-transparent text-[#0e7da1] cursor-pointer leading-none !p-0"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+            {/* Search input */}
+            <input
+              id="treatment-search"
+              value={treatmentSearch}
+              onChange={(e) => {
+                setTreatmentSearch(e.target.value);
+                setIsTreatmentMenuOpen(true);
+              }}
+              onFocus={() => setIsTreatmentMenuOpen(true)}
+              onClick={() => setIsTreatmentMenuOpen(true)}
+              onBlur={() => {
+                window.setTimeout(() => setIsTreatmentMenuOpen(false), 200);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Backspace" && treatmentSearch === "" && selectedTreatments.length > 0) {
+                  e.preventDefault();
+                  removeTreatment(selectedTreatments[selectedTreatments.length - 1].id);
+                }
+              }}
+              placeholder={selectedTreatments.length > 0 ? "Add more..." : "Search or select treatment..."}
+              aria-label="Search treatments"
+              className="self-stretch border-0 outline-none text-sm font-[Inter] text-[#0e2538] !p-1 placeholder:text-[#708599]"
+              autoComplete="off"
+            />
+          </div>
+          {/* Dropdown rendered outside the border box to avoid clipping */}
+          {isTreatmentMenuOpen && filteredTreatments.length > 0 && (
+            <div className="absolute left-0 right-0 top-full mt-1 rounded-lg bg-[#fff] border-[#e0edfa] border-solid border-[1px] shadow-md max-h-52 overflow-auto z-50">
+              {filteredTreatments.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => addTreatment(t)}
+                  className="w-full text-left border-0 bg-transparent !px-3 !py-2 text-sm font-[Inter] text-[#0e2538] hover:bg-[#f5faff] cursor-pointer"
+                >
+                  {t.treatment}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
-
-      {/* Notes textarea */}
-      <div className="self-stretch overflow-hidden flex flex-col items-start gap-1.5">
-        <label
-          htmlFor="notes"
-          className="relative text-[13px] font-medium font-[Inter] text-[#0e2538] text-left"
-        >
-          Additional Notes
-        </label>
-        <textarea
-          id="notes"
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          placeholder="Add any additional notes or observations..."
-          aria-label="Additional notes"
-          className="self-stretch rounded-lg bg-[#fff] border-[#e0edfa] border-solid border-[1px] overflow-hidden !p-3 text-sm font-[Inter] text-[#708599] text-left outline-none focus:border-[#0e7da1] transition-colors resize-none min-h-[100px]"
-        />
+        {/* Notes textarea */}
+        <div className="flex-1 overflow-hidden flex flex-col items-start gap-1.5 min-w-[337px] mq725:min-w-full">
+          <label
+            htmlFor="notes"
+            className="relative text-[13px] font-medium font-[Inter] text-[#0e2538] text-left"
+          >
+            Additional Notes
+          </label>
+          <textarea
+            id="notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Add any additional notes or observations..."
+            aria-label="Additional notes"
+            className="self-stretch rounded-lg bg-[#fff] border-[#e0edfa] border-solid border-[1px] overflow-hidden !p-3 text-sm font-[Inter] text-[#708599] text-left outline-none focus:border-[#0e7da1] transition-colors resize-none min-h-[100px]"
+          />
+        </div>
       </div>
 
       {/* Tooth Numbers + Time of Day + Day of Week row */}
@@ -436,78 +518,51 @@ const LeftColumn: FunctionComponent<LeftColumnType> = ({
             </div>
           )}
         </div>
-        <div className="flex-1 overflow-hidden flex flex-col items-start gap-1.5 min-w-[200px] mq725:min-w-full">
+        <div className="flex-1 overflow-hidden flex flex-col items-start gap-1.5 min-w-[250px] mq725:min-w-full">
           <label
-            htmlFor="time-of-day"
+            htmlFor="select-datetime"
             className="relative text-[13px] font-medium font-[Inter] text-[#0e2538] text-left"
           >
-            Time of Day
-          </label>
-          <select
-            id="time-of-day"
-            value={timeOfDay}
-            onChange={(e) => setTimeOfDay(e.target.value)}
-            aria-label="Select time of day"
-            className="self-stretch rounded-lg bg-[#fff] border-[#e0edfa] border-solid border-[1px] overflow-hidden flex items-center justify-between !pt-[9px] !pb-[9px] !pl-3.5 !pr-3.5 text-sm font-[Inter] text-[#708599] text-left outline-none focus:border-[#0e7da1] transition-colors cursor-pointer"
-          >
-            <option value="0">Unknown / ไม่มีข้อมูล</option>
-            <option value="4">04:00–07:59</option>
-            <option value="8">08:00–11:59</option>
-            <option value="12">12:00–15:59</option>
-            <option value="16">16:00–19:59</option>
-            <option value="20">20:00–23:59</option>
-          </select>
-        </div>
-        <div className="flex-1 overflow-hidden flex flex-col items-start gap-1.5 min-w-[200px] mq725:min-w-full">
-          <label
-            htmlFor="day-of-week"
-            className="relative text-[13px] font-medium font-[Inter] text-[#0e2538] text-left"
-          >
-            Day of Week
-          </label>
-          <select
-            id="day-of-week"
-            value={dayOfWeek}
-            onChange={(e) => setDayOfWeek(e.target.value)}
-            aria-label="Select day of week"
-            className="self-stretch rounded-lg bg-[#fff] border-[#e0edfa] border-solid border-[1px] overflow-hidden flex items-center justify-between !pt-[9px] !pb-[9px] !pl-3.5 !pr-3.5 text-sm font-[Inter] text-[#708599] text-left outline-none focus:border-[#0e7da1] transition-colors cursor-pointer"
-          >
-            <option value="0">Monday</option>
-            <option value="1">Tuesday</option>
-            <option value="2">Wednesday</option>
-            <option value="3">Thursday</option>
-            <option value="4">Friday</option>
-            <option value="5">Saturday</option>
-            <option value="6">Sunday</option>
-          </select>
-        </div>
-        <div className="flex-1 overflow-hidden flex flex-col items-start gap-1.5 min-w-[337px] mq725:min-w-full">
-          <label
-            htmlFor="appointment-rank-in-day"
-            className="relative text-[13px] font-medium font-[Inter] text-[#0e2538] text-left"
-          >
-            Appointment Rank in Day
+            Select Date & Time
           </label>
           <input
-            id="appointment-rank-in-day"
+            id="select-datetime"
+            type="datetime-local"
+            value={selectedDateTime}
+            onChange={(e) => setSelectedDateTime(e.target.value)}
+            aria-label="Select appointment date and time"
+            className="self-stretch rounded-lg bg-[#fff] border-[#e0edfa] border-solid border-[1px] overflow-hidden !pt-[9px] !pb-[9px] !pl-3.5 !pr-3.5 text-sm font-[Inter] text-[#708599] text-left outline-none focus:border-[#0e7da1] transition-colors cursor-pointer"
+          />
+        </div>
+        <div className="flex-1 overflow-hidden flex flex-col items-start gap-1.5 min-w-[200px] mq725:min-w-full">
+          <label
+            htmlFor="total-amount"
+            className="relative text-[13px] font-medium font-[Inter] text-[#0e2538] text-left"
+          >
+            Total Amount (฿)
+          </label>
+          <input
+            id="total-amount"
             type="number"
-            value={appointmentRankInDay ?? ""}
+            step="0.50"
+            min="0"
+            value={totalAmount}
             onChange={(e) => {
               const val = e.target.value;
-              const num = val === "" ? undefined : Number(val);
-              setAppointmentRankInDay(num);
-              if (num !== undefined && (!Number.isInteger(num) || num < 1)) {
-                setAppointmentRankError("Appointment rank must be a positive integer (1 or greater).");
+              const num = val === "" ? 0 : Number(val);
+              setTotalAmount(num);
+              if (num < 0) {
+                setTotalAmountError("Total amount must be greater than or equal to 0.");
               } else {
-                setAppointmentRankError("");
+                setTotalAmountError("");
               }
             }}
-            placeholder="e.g. 1, 2, 3..."
-            aria-label="Appointment rank in day"
+            placeholder="Enter total amount (optional)"
+            aria-label="Total amount"
             className="self-stretch rounded-lg bg-[#fff] border-[#e0edfa] border-solid border-[1px] overflow-hidden !pt-[9px] !pb-[9px] !pl-3.5 !pr-3.5 text-sm font-[Inter] text-[#708599] text-left outline-none focus:border-[#0e7da1] transition-colors"
           />
-          {appointmentRankError && (
-            <span className="text-xs font-[Inter] text-[#b91c1c]">{appointmentRankError}</span>
+          {totalAmountError && (
+            <span className="text-xs font-[Inter] text-[#b91c1c]">{totalAmountError}</span>
           )}
         </div>
       </div>
@@ -518,7 +573,7 @@ const LeftColumn: FunctionComponent<LeftColumnType> = ({
           htmlFor="doctor-search"
           className="relative text-[13px] font-medium font-[Inter] text-[#0e2538] text-left"
         >
-          Doctor (Anonymized ID)
+          Doctor (ID)
         </label>
         <div className="self-stretch rounded-lg bg-[#fff] border-[#e0edfa] border-solid border-[1px] overflow-hidden !p-2 flex flex-col gap-0 transition-colors focus-within:border-[#0e7da1]">
           <input
@@ -590,7 +645,7 @@ const LeftColumn: FunctionComponent<LeftColumnType> = ({
           htmlFor="clinic-search"
           className="relative text-[13px] font-medium font-[Inter] text-[#0e2538] text-left"
         >
-          Clinic (Anonymized ID)
+          Clinic (ID)
         </label>
         <div className="self-stretch rounded-lg bg-[#fff] border-[#e0edfa] border-solid border-[1px] overflow-hidden !p-2 flex flex-col gap-0 transition-colors focus-within:border-[#0e7da1]">
           <input
@@ -626,39 +681,6 @@ const LeftColumn: FunctionComponent<LeftColumnType> = ({
             </div>
           )}
         </div>
-      </div>
-
-      {/* First Case toggle */}
-      <div className="self-stretch rounded-[10px] bg-[#f0faff] border-[#e0edfa] border-solid border-[1px] overflow-hidden flex items-center justify-between !pt-3 !pb-3 !pl-4 !pr-4 gap-5">
-        <div className="overflow-hidden flex flex-col items-start gap-[3px]">
-          <span className="relative text-sm font-medium font-[Inter] text-[#0e2538] text-left">
-            Is First Case of the Day?
-          </span>
-          <span className="relative text-xs font-[Inter] text-[#708599] text-left">
-            First case patterns affect duration prediction accuracy.
-          </span>
-        </div>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={isFirstCase}
-          aria-label="Toggle first case of the day"
-          onClick={handleToggle}
-          className={`relative rounded-xl overflow-hidden flex items-center justify-end !p-0.5 cursor-pointer border-0 transition-all duration-300 ease-in-out transform hover:scale-105 ${
-            isFirstCase
-              ? "bg-gradient-to-r from-[#0e7da1] to-[#0b6a8a] shadow-lg shadow-[#0e7da1]/30 ring-2 ring-[#0e7da1]/20"
-              : "bg-[#d1d5db] hover:bg-[#c1c5c9]"
-          }`}
-        >
-          <span
-            className={`h-5 w-5 rounded-[10px] bg-[#fff] overflow-hidden shrink-0 flex flex-col items-start transition-all duration-300 ease-in-out shadow-md ${
-              isFirstCase ? "translate-x-0" : "-translate-x-5"
-            }`}
-          />
-          {isFirstCase && (
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#0e7da1]/10 to-[#0b6a8a]/10 animate-pulse" />
-          )}
-        </button>
       </div>
 
       {/* Submit button */}

@@ -98,7 +98,7 @@ const Landing: FunctionComponent = () => {
           DentTime &mdash; AI-Powered Smart Dentist Scheduling
         </span>
         <span className="relative text-[13px] text-[#708599]">
-          SE for ML Project &middot; 2025
+          SE for ML Project &middot; 2025 &middot; Team Two to one
         </span>
       </footer>
     </div>

@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
+from flask import request
+
 from app.routers.predict import router as predict_router
 from app.routers.actual import router as actual_router
 from app.routers.options import router as options_router
@@ -9,13 +11,20 @@ from app.routers.options import router as options_router
 from src.features.feature_transformer import FeatureTransformer
 import json
 
-
 ARTIFACTS = 'src/features/artifacts'
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
+
+from app.services.model_loader import load_model
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    
     # startup logic
+    app.state.model = load_model()
+    print("Model loaded")
+
     app.state.transformer = FeatureTransformer(
         doctor_profile_path=f"{ARTIFACTS}/doctor_profile.json",
         clinic_profile_path=f"{ARTIFACTS}/clinic_profile.json",

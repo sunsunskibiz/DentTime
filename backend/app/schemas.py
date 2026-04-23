@@ -26,39 +26,16 @@ class APIRequest(BaseModel):
     treatmentSymptoms: str
     toothNumbers: Optional[str] = None
     surfaces: Optional[str] = None
-    timeOfDay: str
-    dayOfWeek: str
-    appointmentRankInDay: Optional[int] = None
+    totalAmount: float
+    selectedDateTime: str
     doctorId: Optional[str] = None
     clinicId: str
-    isFirstCase: bool
     notes: Optional[str] = None
-    request_time: datetime
     @field_validator("treatmentSymptoms")
     @classmethod
     def validate_treatment_symptoms(cls, v):
         if not v or not v.strip():
             raise ValueError("treatmentSymptoms is required")
-        return v
-
-    @field_validator("timeOfDay")
-    @classmethod
-    def validate_time_of_day(cls, v):
-        if not v or not v.strip():
-            raise ValueError("timeOfDay is required")
-        allowed = {"0", "4", "8", "12", "16", "20"}
-        if v not in allowed:
-            raise ValueError("timeOfDay must be one of: 0, 4, 8, 12, 16, 20")
-        return v
-
-    @field_validator("dayOfWeek")
-    @classmethod
-    def validate_day_of_week(cls, v):
-        if not v or not v.strip():
-            raise ValueError("dayOfWeek is required")
-        allowed = {"0", "1", "2", "3", "4", "5", "6"}
-        if v not in allowed:
-            raise ValueError("dayOfWeek must be one of: 0, 1, 2, 3, 4, 5, 6")
         return v
     
     @field_validator("clinicId")
@@ -70,24 +47,29 @@ class APIRequest(BaseModel):
 
 class PredictResponse(BaseModel):
     predicted_duration_class: int
-    unit: str
+    confidence: dict
     model_version: str
     timestamp: datetime
     request_id: str
     status: str
     processing_time_ms: float
 
-class SymptomOption(BaseModel):
-    id: str
-    symptom: str
-
 class DoctorOption(BaseModel):
     id: str
     doctor: str
 
+class ClinicOption(BaseModel):
+    id: str
+    clinic: str
+
+class treatmentOption(BaseModel):
+    id: str
+    treatment: str
 class OptionsResponse(BaseModel):
-    symptoms: List[SymptomOption]
+    treatments: List[treatmentOption]
     doctors: List[DoctorOption]
+    clinics: List[ClinicOption]
+
 
 
 class ActualRequest(BaseModel):

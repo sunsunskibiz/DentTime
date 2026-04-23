@@ -28,12 +28,12 @@ function App() {
 
     switch (pathname) {
       case "/":
-        title = "DentTime — AI-Powered Smart Dentist Scheduling";
-        metaDescription = "DentTime predicts the right treatment duration so clinic staff can book smarter appointments.";
-        break;
-      case "/login":
         title = "Login — DentTime";
         metaDescription = "Login to DentTime to access the appointment duration predictor.";
+        break;
+      case "/home":
+        title = "DentTime — AI-Powered Smart Dentist Scheduling";
+        metaDescription = "DentTime predicts the right treatment duration so clinic staff can book smarter appointments.";
         break;
       case "/predict":
         title = "Predict Appointment Duration — DentTime";
@@ -65,8 +65,8 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Landing />} />
-      <Route path="/login" element={<Login />} />
+      <Route path="/" element={<Login />} />
+      <Route path="/home" element={<Landing />} />
       <Route path="/predict" element={<Predict />} />
       <Route path="/how-it-works" element={<HowItWorks />} />
       <Route path="/about" element={<About />} />
