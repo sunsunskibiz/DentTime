@@ -3,15 +3,15 @@
 DentTime/
 ├── backend/
 │   └── app/
-│       ├── main.py                   # FastAPI application entrypoint (lifespan & router registration)
-│       ├── routers/                 # API endpoints (prediction, options, etc.)
+│       ├── main.py                 # FastAPI application entrypoint (lifespan & router registration)
+│       ├── routers/                # API endpoints (prediction, options, etc.)
 │       └── services/
-│           └── model_loader.py      # Utility for loading model artifacts at startup
+│           └── model_loader.py     # Utility for loading model artifacts at startup
 │
 ├── frontend/                       # Vite-based frontend application
-│   ├── public/                      # Static assets served as-is
+│   ├── public/                     # Static assets served as-is
 │   ├── src/
-│   │   ├── assets/                  # Images and static resources
+│   │   ├── assets/                 # Images and static resources
 │   │   ├── components/             # Reusable UI components (used across pages)
 │   │   ├── pages/                  # Page-level views (Login, Prediction, etc.)
 │   │   ├── App.tsx                 # Root React component
