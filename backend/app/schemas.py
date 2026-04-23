@@ -6,18 +6,38 @@ from datetime import datetime
 #     id: str
 #     symptom: str
 
+
 class PredictRequest(BaseModel):
-    treatmentSymptoms: List[str]
-    toothNumbers: Optional[List[str]] = None
+    clinic_pseudo_id: str
+    dentist_pseudo_id: Optional[str] = None
+    has_dentist_id: int                       # 0 or 1 not done
+    treatment: str
+    tooth_no: Optional[str] = None
+    surfaces: Optional[str] = None
+    total_amount: float
+    has_notes: int                            # 0 or 1
+    appt_day_of_week: int                     # 0–6
+    appt_hour_bucket: int                     # 0 if unknown, else {4,8,12,16,20}
+    is_first_case: int                        # 0 or 1
+    appointment_rank_in_day: Optional[int] = None
+
+
+class APIRequest(BaseModel):
+    treatmentSymptoms: str
+    toothNumbers: Optional[str] = None
+    surfaces: Optional[str] = None
     timeOfDay: str
-    doctorId: str
+    dayOfWeek: str
+    appointmentRankInDay: Optional[int] = None
+    doctorId: Optional[str] = None
+    clinicId: str
     isFirstCase: bool
     notes: Optional[str] = None
     request_time: datetime
     @field_validator("treatmentSymptoms")
     @classmethod
     def validate_treatment_symptoms(cls, v):
-        if not v or len(v) == 0:
+        if not v or not v.strip():
             raise ValueError("treatmentSymptoms is required")
         return v
 
@@ -26,13 +46,26 @@ class PredictRequest(BaseModel):
     def validate_time_of_day(cls, v):
         if not v or not v.strip():
             raise ValueError("timeOfDay is required")
+        allowed = {"0", "4", "8", "12", "16", "20"}
+        if v not in allowed:
+            raise ValueError("timeOfDay must be one of: 0, 4, 8, 12, 16, 20")
         return v
 
-    @field_validator("doctorId")
+    @field_validator("dayOfWeek")
     @classmethod
-    def validate_doctor_id(cls, v):
+    def validate_day_of_week(cls, v):
         if not v or not v.strip():
-            raise ValueError("doctor is required or check if doctor is valid")
+            raise ValueError("dayOfWeek is required")
+        allowed = {"0", "1", "2", "3", "4", "5", "6"}
+        if v not in allowed:
+            raise ValueError("dayOfWeek must be one of: 0, 1, 2, 3, 4, 5, 6")
+        return v
+    
+    @field_validator("clinicId")
+    @classmethod
+    def validate_clinic_id(cls, v):
+        if not v or not v.strip():
+            raise ValueError("clinicId is required")
         return v
 
 class PredictResponse(BaseModel):

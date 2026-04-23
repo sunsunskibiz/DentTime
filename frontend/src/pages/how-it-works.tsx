@@ -33,7 +33,7 @@ const HowItWorks: FunctionComponent = () => {
           id="how-it-works-heading"
           className="!m-0 relative text-[44px] font-extrabold font-[inherit] text-[#fff] mq450:text-[26px] mq1050:text-[35px]"
         >
-          From Data to Decision in Under 1 Second
+          From Data to Decision
         </h1>
         <p className="!m-0 relative text-[17px]">
           DentTime is a full ML system — from raw clinic data to real-time

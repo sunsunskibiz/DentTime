@@ -57,7 +57,7 @@ const PerfSec: FunctionComponent<PerfSecProps> = ({ className = "" }) => {
           id="perf-sec-heading"
           className="!m-0 relative text-4xl font-extrabold font-[inherit] text-[#0e2538] mq450:text-[22px] mq1050:text-[29px]"
         >
-          Evaluation Metrics
+          Evaluation Metrics (Examples)
         </h2>
         <p className="!m-0 relative text-base text-[#708599]">
           Measured on held-out test data (Month 12) using chronological split to

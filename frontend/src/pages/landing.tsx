@@ -40,10 +40,10 @@ const Landing: FunctionComponent = () => {
         <div className="h-12 w-px bg-[#fff] overflow-hidden shrink-0 flex flex-col items-start mq1125:w-full mq1125:h-px" />
         <div className="flex-1 overflow-hidden flex flex-col items-center justify-center !pt-0 !pb-0 !pl-8 !pr-8 box-border gap-1 min-w-[207px]">
           <h2 className="!m-0 relative text-[length:inherit] font-extrabold font-[inherit] mq450:text-[19px] mq1050:text-[26px]">
-            7
+            6
           </h2>
           <p className="!m-0 relative text-sm text-[#b8e8f5]">
-            Duration Slots (15&ndash;105 min)
+            Duration Slots (15,30,45,60,90,105 min)
           </p>
         </div>
         <div className="h-12 w-px bg-[#fff] overflow-hidden shrink-0 flex flex-col items-start mq1125:w-full mq1125:h-px" />

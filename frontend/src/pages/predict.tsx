@@ -112,7 +112,7 @@ const Predict: FunctionComponent = () => {
           DentTime &mdash; AI-Powered Smart Dentist Scheduling
         </span>
         <span className="relative text-[13px] text-[#708599]">
-          SE for ML Project &middot; 2026
+          SE for ML Project &middot; 2025
         </span>
       </footer>
     </div>

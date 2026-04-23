@@ -6,8 +6,10 @@ import {
   useLocation,
 } from "react-router-dom";
 import Landing from "./pages/landing";
+import Login from "./pages/login";
 import Predict from "./pages/predict";
 import HowItWorks from "./pages/how-it-works";
+import About from "./pages/about";
 
 function App() {
   const action = useNavigationType();
@@ -29,6 +31,10 @@ function App() {
         title = "DentTime — AI-Powered Smart Dentist Scheduling";
         metaDescription = "DentTime predicts the right treatment duration so clinic staff can book smarter appointments.";
         break;
+      case "/login":
+        title = "Login — DentTime";
+        metaDescription = "Login to DentTime to access the appointment duration predictor.";
+        break;
       case "/predict":
         title = "Predict Appointment Duration — DentTime";
         metaDescription = "Fill in patient details to get an AI-predicted treatment time window.";
@@ -36,6 +42,10 @@ function App() {
       case "/how-it-works":
         title = "How It Works — DentTime";
         metaDescription = "Learn how DentTime's ML pipeline turns raw clinic data into real-time appointment scheduling support.";
+        break;
+      case "/about":
+        title = "About — DentTime";
+        metaDescription = "Learn more about DentTime's mission to revolutionize dental appointment scheduling with AI.";
         break;
     }
 
@@ -56,8 +66,10 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
+      <Route path="/login" element={<Login />} />
       <Route path="/predict" element={<Predict />} />
       <Route path="/how-it-works" element={<HowItWorks />} />
+      <Route path="/about" element={<About />} />
     </Routes>
   );
 }

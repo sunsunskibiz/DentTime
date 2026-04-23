@@ -1,8 +1,8 @@
 import { type FunctionComponent, useMemo, useState, type CSSProperties } from "react";
 
-interface Symptom {
+interface TreatmentSymptom {
   id: string;
-  symptom: string;
+  treatment: string;
 }
 
 export type SymptomsType = {
@@ -11,13 +11,13 @@ export type SymptomsType = {
   egScalingRootPlaning?: string;
 
   /** All available options */
-  options: Symptom[];
+  options: TreatmentSymptom[];
 
   /** Selected values */
-  value?: Symptom[];
+  value?: TreatmentSymptom[];
 
   /** On change */
-  onChange?: (value: Symptom[]) => void;
+  onChange?: (value: TreatmentSymptom[]) => void;
 
   symptomsAlignSelf?: CSSProperties["alignSelf"];
   symptomsFlex?: CSSProperties["flex"];
@@ -46,10 +46,10 @@ const Symptoms: FunctionComponent<SymptomsType> = ({
     [symptomsAlignSelf, symptomsFlex, symptomsMinWidth]
   );
 
-  const toggleOption = (option: Symptom) => {
+  const toggleOption = (option: TreatmentSymptom) => {
     const exists = value.find((v) => v.id === option.id);
 
-    let newValue: Symptom[];
+    let newValue: TreatmentSymptom[];
     if (exists) {
       newValue = value.filter((v) => v.id !== option.id);
     } else {
@@ -61,7 +61,7 @@ const Symptoms: FunctionComponent<SymptomsType> = ({
 
   const displayValue =
     value.length > 0
-      ? value.map((v) => v.symptom).join(", ")
+      ? value.map((v) => v.treatment).join(", ")
       : egScalingRootPlaning;
 
   const isPlaceholder = value.length === 0;
@@ -101,7 +101,7 @@ const Symptoms: FunctionComponent<SymptomsType> = ({
                   selected ? "bg-[#e6f4fa]" : ""
                 }`}
               >
-                <span>{opt.symptom}</span>
+                <span>{opt.treatment}</span>
                 {selected && <span>✓</span>}
               </div>
             );

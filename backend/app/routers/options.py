@@ -1,20 +1,24 @@
-from fastapi import APIRouter
-
-from app.schemas import OptionsResponse
+from fastapi import APIRouter, Request
 
 router = APIRouter(tags=["options"])
 
-@router.get("/options", response_model=OptionsResponse)
-def get_options():
+
+@router.get("/options")
+def get_options(request: Request):
+    doctor_profile = request.app.state.doctor_profile
+    clinic_profile = request.app.state.clinic_profile
+
+    doctors = [
+        {"id": doctor_id, "doctor": doctor_id}
+        for doctor_id in sorted(doctor_profile.keys())
+    ]
+
+    clinics = [
+        {"id": clinic_id, "clinic": clinic_id}
+        for clinic_id in sorted(clinic_profile.keys())
+    ]
+
     return {
-        "symptoms": [
-            {"id": "1", "symptom": "Tooth pain"},
-            {"id": "2", "symptom": "Swelling"},
-            {"id": "3", "symptom": "Bleeding gums"},
-        ],
-        "doctors": [
-            {"id": "1", "doctor": "Dr. Smith"},
-            {"id": "2", "doctor": "Dr. John"},
-            {"id": "3", "doctor": "Dr. Emily"},
-        ],
+        "doctors": doctors,
+        "clinics": clinics,
     }
