@@ -8,6 +8,7 @@ import pandas as pd
 from .treatment_mapper import build_reverse_map, load_treatment_dict, map_treatment
 from .tooth_parser import parse_tooth_no
 
+pd.set_option('future.no_silent_downcasting', True)
 
 def build_treatment_encoding(treatment_dict: dict) -> dict:
     """Deterministic str→int encoding: sorted dict keys → 0…N-1."""
