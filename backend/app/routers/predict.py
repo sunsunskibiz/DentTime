@@ -133,7 +133,6 @@ def predict_api(data: APIRequest, request: Request):
 
     proba = model.predict_proba(X)[0]
     proba_percent = (proba * 100).tolist()
-    print(proba_percent)
     return {
         'predicted_duration_class': duration_minutes,
         'confidence': proba_percent,

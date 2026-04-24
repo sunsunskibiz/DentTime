@@ -44,6 +44,7 @@ class APIRequest(BaseModel):
         if not v or not v.strip():
             raise ValueError("clinicId is required")
         return v
+    
 
 class PredictResponse(BaseModel):
     predicted_duration_class: int
