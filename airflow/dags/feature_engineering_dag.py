@@ -1,10 +1,3 @@
-"""
-DentTime feature engineering DAG.
-
-7 tasks that wrap feature_engineering.py as independently-rerunnable steps.
-Outputs are written to the project root bind mount so version-control tracking
-on the host works without any file copying.
-"""
 import sys
 from pathlib import Path
 

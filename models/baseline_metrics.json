@@ -1,0 +1,19 @@
+{
+  "model_version": "denttime_xgb_retrain",
+  "macro_f1": 0.4101,
+  "mae_minutes": 8.42,
+  "under_estimation_rate": 0.0961,
+  "class_labels": [
+    15,
+    30,
+    45,
+    60,
+    90,
+    105
+  ],
+  "degradation_thresholds": {
+    "macro_f1_drop": 0.05,
+    "under_est_rate_max": 0.2,
+    "mae_increase_max": 5
+  }
+}
