@@ -10,7 +10,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 BASE_URL = os.getenv("DENTTIME_API_URL", "http://127.0.0.1:8000").rstrip("/")
-TIMEOUT_SECONDS = float(os.getenv("DENTTIME_SMOKE_TIMEOUT", "120"))
+TIMEOUT_SECONDS = float(os.getenv("DENTTIME_SMOKE_TIMEOUT", "90"))
 
 
 def _request(method: str, path: str, payload: dict[str, Any] | None = None) -> tuple[int, str]:
@@ -22,7 +22,7 @@ def _request(method: str, path: str, payload: dict[str, Any] | None = None) -> t
 
     req = Request(f"{BASE_URL}{path}", data=body, headers=headers, method=method)
     try:
-        with urlopen(req, timeout=20) as resp:
+        with urlopen(req, timeout=10) as resp:
             return resp.status, resp.read().decode("utf-8")
     except HTTPError as exc:
         error_body = exc.read().decode("utf-8", errors="replace")
@@ -42,15 +42,18 @@ def _json_request(method: str, path: str, payload: dict[str, Any] | None = None)
 def _wait_until_ready() -> None:
     deadline = time.time() + TIMEOUT_SECONDS
     last_error: Exception | None = None
+    attempt = 0
 
     while time.time() < deadline:
+        attempt += 1
         try:
-            root = _json_request("GET", "/")
+            root = _json_request("GET", "/health")
             print(f"api ready: {root}", flush=True)
             return
-        except Exception as exc:  # API may still be starting.
+        except Exception as exc:
             last_error = exc
-            time.sleep(2)
+            print(f"waiting for api... attempt={attempt}, last_error={exc}", flush=True)
+            time.sleep(3)
 
     raise RuntimeError(f"API was not ready within {TIMEOUT_SECONDS:.0f}s. Last error: {last_error}")
 

@@ -6,10 +6,11 @@ MODEL_PATH = BASE_DIR / "artifacts" / "model.joblib"
 
 
 def load_model():
-    print("Loading model from:", MODEL_PATH)
+    print("Loading model from:", MODEL_PATH, flush=True)
 
     if not MODEL_PATH.exists():
         raise FileNotFoundError(f"Model not found at {MODEL_PATH}")
 
     model = joblib.load(MODEL_PATH)
+    print("Model artifact loaded successfully", flush=True)
     return model
