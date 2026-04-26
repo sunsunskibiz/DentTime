@@ -10,6 +10,7 @@ services:
       - ./data:/app/data
       - ./artifacts:/app/artifacts:ro
       - ./monitoring:/app/monitoring
+      - ./smoke_test_integration.py:/app/smoke_test_integration.py:ro
 
   frontend:
     build:
