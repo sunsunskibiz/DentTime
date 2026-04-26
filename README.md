@@ -11,3 +11,7 @@ http://localhost:8000/docs
 
 ### Test Frontend
 http://localhost:5173
+### Smoke Test
+```bash
+python smoke_test_integration.py
+```
