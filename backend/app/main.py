@@ -1,47 +1,48 @@
+from __future__ import annotations
+
+import json
+from contextlib import asynccontextmanager
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
 
-from flask import request
-
-from app.routers.predict import router as predict_router
+from app.db import init_db
 from app.routers.actual import router as actual_router
 from app.routers.options import router as options_router
-
-from src.features.feature_transformer import FeatureTransformer
-import json
-
-ARTIFACTS = 'src/features/artifacts'
-from contextlib import asynccontextmanager
-from fastapi import FastAPI
-
+from app.routers.predict import router as predict_router
+from app.monitoring_metrics import router as monitoring_router
 from app.services.model_loader import load_model
+from src.features.feature_transformer import FeatureTransformer
+
+ARTIFACTS_DIR = Path("src/features/artifacts")
+
+
+def _load_json(path: Path) -> dict:
+    if not path.exists():
+        raise FileNotFoundError(f"Required artifact not found: {path}")
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    
-    # startup logic
+    init_db()
+
     app.state.model = load_model()
     print("Model loaded")
 
     app.state.transformer = FeatureTransformer(
-        doctor_profile_path=f"{ARTIFACTS}/doctor_profile.json",
-        clinic_profile_path=f"{ARTIFACTS}/clinic_profile.json",
-        treatment_dict_path=f"{ARTIFACTS}/treatment_dict.json",
-        treatment_encoding_path=f"{ARTIFACTS}/treatment_encoding.json",
+        doctor_profile_path=str(ARTIFACTS_DIR / "doctor_profile.json"),
+        clinic_profile_path=str(ARTIFACTS_DIR / "clinic_profile.json"),
+        treatment_dict_path=str(ARTIFACTS_DIR / "treatment_dict.json"),
+        treatment_encoding_path=str(ARTIFACTS_DIR / "treatment_encoding.json"),
     )
 
-    with open(f"{ARTIFACTS}/doctor_profile.json", "r", encoding="utf-8") as f:
-        app.state.doctor_profile = json.load(f)
+    app.state.doctor_profile = _load_json(ARTIFACTS_DIR / "doctor_profile.json")
+    app.state.clinic_profile = _load_json(ARTIFACTS_DIR / "clinic_profile.json")
+    app.state.treatment_encoding = _load_json(ARTIFACTS_DIR / "treatment_encoding.json")
 
-    with open(f"{ARTIFACTS}/clinic_profile.json", "r", encoding="utf-8") as f:
-        app.state.clinic_profile = json.load(f)
-
-    with open(f"{ARTIFACTS}/treatment_encoding.json", "r", encoding="utf-8") as f:
-        app.state.treatment_encoding = json.load(f)
-
-    yield  # app starts running here
+    yield
 
 
 app = FastAPI(title="DentTime Backend", lifespan=lifespan)
@@ -57,7 +58,7 @@ app.add_middleware(
 app.include_router(predict_router)
 app.include_router(actual_router)
 app.include_router(options_router)
-
+app.include_router(monitoring_router)
 
 
 @app.get("/")
