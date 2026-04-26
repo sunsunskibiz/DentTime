@@ -8,6 +8,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/app ./app
 COPY src ./src
 COPY artifacts ./artifacts
+COPY monitoring ./monitoring
+COPY run_metrics_loop.py ./run_metrics_loop.py
+COPY smoke_test_integration.py ./smoke_test_integration.py
 
 EXPOSE 8000
 
