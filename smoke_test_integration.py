@@ -2,56 +2,73 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
+from app.db import get_conn
 from app.main import app
-from monitoring.update_metrics import main as update_metrics
+
+
+def prediction_count() -> int:
+    conn = get_conn()
+    try:
+        return int(conn.execute("SELECT COUNT(*) FROM predictions").fetchone()[0])
+    finally:
+        conn.close()
 
 
 def main() -> None:
     with TestClient(app) as client:
-        options = client.get('/options')
+        options = client.get("/options")
         options.raise_for_status()
         data = options.json()
-        first_symptom = data['symptoms'][0]['symptom']
-        first_doctor = data['doctors'][0]['id'] if data['doctors'] else ''
+
+        first_treatment = data["treatments"][0]["treatment"]
+        first_doctor = data["doctors"][0]["id"] if data["doctors"] else None
+        first_clinic = data["clinics"][0]["id"]
+
+        before = prediction_count()
 
         predict_payload = {
-            'treatmentSymptoms': [first_symptom],
-            'toothNumbers': ['16'],
-            'timeOfDay': 'morning',
-            'doctorId': first_doctor,
-            'isFirstCase': False,
-            'notes': 'smoke test',
-            'request_time': '2026-04-21T00:00:00Z',
+            "treatmentSymptoms": first_treatment,
+            "toothNumbers": "16",
+            "surfaces": "none",
+            "selectedDateTime": "2026-04-27T09:30",
+            "totalAmount": 1200,
+            "doctorId": first_doctor,
+            "clinicId": first_clinic,
+            "notes": "smoke test",
+            "request_time": "2026-04-27T02:30:00Z",
         }
-        pred = client.post('/predict', json=predict_payload)
+
+        pred = client.post("/predict", json=predict_payload)
         pred.raise_for_status()
         pred_json = pred.json()
-        print('predict:', pred_json)
+        print("predict:", pred_json)
+
+        after = prediction_count()
+        assert after == before + 1, f"prediction log count did not increase: before={before}, after={after}"
 
         actual_payload = {
-            'request_id': pred_json['request_id'],
-            'actual_duration': pred_json['predicted_duration_class'],
-            'unit': 'minutes',
-            'completed_at': '2026-04-21T01:00:00Z',
+            "request_id": pred_json["request_id"],
+            "actual_duration": pred_json["predicted_duration_class"],
+            "unit": "minutes",
+            "completed_at": "2026-04-27T03:00:00Z",
         }
-        actual = client.post('/actual', json=actual_payload)
+        actual = client.post("/actual", json=actual_payload)
         actual.raise_for_status()
-        print('actual:', actual.json())
+        print("actual:", actual.json())
 
-        update_metrics()
-        metrics = client.get('/metrics')
+        metrics = client.get("/metrics")
         metrics.raise_for_status()
         body = metrics.text
         required = [
-            'denttime_prediction_requests_total',
-            'denttime_logged_predictions_total',
-            'denttime_macro_f1',
-            'denttime_feature_psi',
+            "denttime_logged_predictions_total",
+            "denttime_macro_f1",
+            "denttime_feature_psi",
         ]
         for token in required:
-            assert token in body, f'missing metric: {token}'
-        print('metrics: ok')
+            assert token in body, f"missing metric: {token}"
+        print("metrics: ok")
+        print(f"logged_predictions_total increased from {before} to {after}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

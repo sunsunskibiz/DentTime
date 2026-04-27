@@ -1,24 +1,21 @@
-from pydantic import BaseModel, field_validator
-from typing import List, Optional
 from datetime import datetime
+from typing import List, Optional
 
-# class Symptom(BaseModel):
-#     id: str
-#     symptom: str
+from pydantic import BaseModel, field_validator
 
 
 class PredictRequest(BaseModel):
     clinic_pseudo_id: str
     dentist_pseudo_id: Optional[str] = None
-    has_dentist_id: int                       # 0 or 1 not done
+    has_dentist_id: int
     treatment: str
     tooth_no: Optional[str] = None
     surfaces: Optional[str] = None
     total_amount: float
-    has_notes: int                            # 0 or 1
-    appt_day_of_week: int                     # 0–6
-    appt_hour_bucket: int                     # 0 if unknown, else {4,8,12,16,20}
-    is_first_case: int                        # 0 or 1
+    has_notes: int
+    appt_day_of_week: int
+    appt_hour_bucket: int
+    is_first_case: int
     appointment_rank_in_day: Optional[int] = None
 
 
@@ -31,46 +28,52 @@ class APIRequest(BaseModel):
     doctorId: Optional[str] = None
     clinicId: str
     notes: Optional[str] = None
+    request_time: Optional[str] = None
+
     @field_validator("treatmentSymptoms")
     @classmethod
     def validate_treatment_symptoms(cls, v):
         if not v or not v.strip():
             raise ValueError("treatmentSymptoms is required")
         return v
-    
+
     @field_validator("clinicId")
     @classmethod
     def validate_clinic_id(cls, v):
         if not v or not v.strip():
             raise ValueError("clinicId is required")
         return v
-    
+
 
 class PredictResponse(BaseModel):
     predicted_duration_class: int
-    confidence: dict
+    confidence: List[float]
+    unit: str = "minutes"
     model_version: str
     timestamp: datetime
     request_id: str
     status: str
-    processing_time_ms: float
+
 
 class DoctorOption(BaseModel):
     id: str
     doctor: str
 
+
 class ClinicOption(BaseModel):
     id: str
     clinic: str
 
-class treatmentOption(BaseModel):
+
+class TreatmentOption(BaseModel):
     id: str
     treatment: str
+
+
 class OptionsResponse(BaseModel):
-    treatments: List[treatmentOption]
+    treatments: List[TreatmentOption]
     doctors: List[DoctorOption]
     clinics: List[ClinicOption]
-
 
 
 class ActualRequest(BaseModel):

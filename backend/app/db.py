@@ -1,15 +1,17 @@
 from __future__ import annotations
 
+import os
 import sqlite3
 from pathlib import Path
 
-DB_PATH = Path("data/denttime.db")
+DB_PATH = Path(os.getenv("DB_PATH", "data/denttime.db"))
 
 
 def get_conn() -> sqlite3.Connection:
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=10)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA busy_timeout = 5000")
     return conn
 
 
@@ -24,6 +26,7 @@ def _ensure_column(conn: sqlite3.Connection, table: str, column: str, ddl_type: 
 
 def init_db() -> None:
     conn = get_conn()
+    conn.execute("PRAGMA journal_mode = WAL")
     conn.execute(
         """
         CREATE TABLE IF NOT EXISTS predictions (

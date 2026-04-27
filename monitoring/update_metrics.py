@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import sqlite3
 from pathlib import Path
 from typing import Any, Dict, List
@@ -9,10 +10,10 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import f1_score, mean_absolute_error
 
-DB_PATH = Path("data/denttime.db")
-REFERENCE_PATH = Path("data/reference/reference_features.parquet")
-FEATURE_STATS_PATH = Path("artifacts/feature_stats.json")
-STATE_PATH = Path("monitoring/state.json")
+DB_PATH = Path(os.getenv("DB_PATH", "data/denttime.db"))
+REFERENCE_PATH = Path(os.getenv("REFERENCE_PATH", "data/reference/reference_features.parquet"))
+FEATURE_STATS_PATH = Path(os.getenv("FEATURE_STATS_PATH", "artifacts/feature_stats.json"))
+STATE_PATH = Path(os.getenv("STATE_PATH", "monitoring/state.json"))
 FEATURE_COLUMNS = [
     "treatment_class",
     "composite_treatment_flag",
@@ -97,12 +98,28 @@ def build_live_features(live: pd.DataFrame) -> pd.DataFrame:
 
 
 
+def _first_present(obj: dict, keys: list[str]) -> Any:
+    for key in keys:
+        if key in obj:
+            return obj.get(key)
+    return None
+
+
 def compute_input_missing_rate(live: pd.DataFrame) -> float:
+    """Support both the old demo payload and the current frontend payload."""
     if "input_payload_json" not in live.columns:
         return 0.0
+
     total = 0
     missing = 0
-    watched = ["treatmentSymptoms", "timeOfDay", "doctorId", "toothNumbers", "notes"]
+    watched = [
+        ["treatmentSymptoms"],
+        ["selectedDateTime", "timeOfDay"],
+        ["doctorId"],
+        ["toothNumbers"],
+        ["notes"],
+    ]
+
     for raw in live["input_payload_json"].fillna(""):
         if not raw:
             continue
@@ -110,11 +127,13 @@ def compute_input_missing_rate(live: pd.DataFrame) -> float:
             obj = json.loads(raw)
         except json.JSONDecodeError:
             continue
-        for key in watched:
+
+        for key_group in watched:
             total += 1
-            value = obj.get(key)
+            value = _first_present(obj, key_group)
             if value is None or value == "" or value == []:
                 missing += 1
+
     return float(missing / total) if total else 0.0
 
 
@@ -124,7 +143,8 @@ def main() -> None:
     reference = pd.read_parquet(REFERENCE_PATH) if REFERENCE_PATH.exists() else pd.DataFrame(columns=FEATURE_COLUMNS)
     baseline_stats = load_json(FEATURE_STATS_PATH)
 
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=10)
+    conn.execute("PRAGMA busy_timeout = 5000")
     live = pd.read_sql_query("SELECT * FROM predictions", conn)
     conn.close()
 
