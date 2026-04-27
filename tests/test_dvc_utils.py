@@ -11,7 +11,7 @@ ARGS = {
     "project_root": "/opt/airflow/project",
 }
 
-PUBLISHED_CSV = "/opt/airflow/project/data/published/data.csv"
+PUBLISHED_CSV = "/opt/airflow/project/data/published/2026-04-01/data.csv"
 
 
 @patch("src.features.dvc_utils.shutil.copy")

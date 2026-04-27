@@ -29,7 +29,7 @@ def pull_raw_data(dvc_file, local_csv, remote, project_root):
             cwd=project_root, check=True,
         )
         published_dir = os.path.join(project_root, "data", "published")
-        csv_files = glob.glob(os.path.join(published_dir, "*.csv"))
+        csv_files = glob.glob(os.path.join(published_dir, "**", "*.csv"), recursive=True)
         if not csv_files:
             raise RuntimeError(f"DVC pull succeeded but no .csv found in {published_dir}")
         shutil.copy(csv_files[0], local_csv)

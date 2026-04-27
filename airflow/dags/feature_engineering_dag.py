@@ -27,7 +27,7 @@ def _task_pull_raw_data():
 
     status = pull_raw_data(
         dvc_file="data/published.dvc",
-        local_csv=str(RAW_CSV),
+        local_csv=str(PROJECT_ROOT / "data" / "raw" / "data.csv"),
         remote="dagshub-raw",
         project_root=str(PROJECT_ROOT),
     )
