@@ -1,15 +1,18 @@
 from pathlib import Path
 import joblib
+import os
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent  # /app
-MODEL_PATH = BASE_DIR / "artifacts" / "model.joblib"
+from src.features.feature_transformer import FEATURE_COLUMNS
+
+MODEL_PATH = Path(os.getenv("MODEL_PATH", "/app/artifacts/model.joblib"))
 
 
 def load_model():
-    print("Loading model from:", MODEL_PATH)
-
     if not MODEL_PATH.exists():
         raise FileNotFoundError(f"Model not found at {MODEL_PATH}")
 
-    model = joblib.load(MODEL_PATH)
-    return model
+    loaded = joblib.load(MODEL_PATH)
+    if isinstance(loaded, dict) and "model" in loaded:
+        return loaded
+
+    return {"model": loaded, "feature_cols": FEATURE_COLUMNS, "index_to_class": {}}

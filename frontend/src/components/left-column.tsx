@@ -63,7 +63,7 @@ const LeftColumn: FunctionComponent<LeftColumnType> = ({
     const now = new Date();
     return now.toISOString().slice(0, 16);
   });
-  const [totalAmount, setTotalAmount] = useState<number>(0);
+  const [totalAmount, setTotalAmount] = useState<number>();
   const [totalAmountError, setTotalAmountError] = useState("");
   const [doctorId, setDoctorId] = useState("");
   const [doctorSearch, setDoctorSearch] = useState("");
@@ -557,7 +557,7 @@ const LeftColumn: FunctionComponent<LeftColumnType> = ({
                 setTotalAmountError("");
               }
             }}
-            placeholder="Enter total amount (optional)"
+            placeholder="Enter total amount (required)"
             aria-label="Total amount"
             className="self-stretch rounded-lg bg-[#fff] border-[#e0edfa] border-solid border-[1px] overflow-hidden !pt-[9px] !pb-[9px] !pl-3.5 !pr-3.5 text-sm font-[Inter] text-[#708599] text-left outline-none focus:border-[#0e7da1] transition-colors"
           />
