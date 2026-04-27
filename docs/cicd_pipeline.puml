@@ -1,0 +1,303 @@
+@startuml denttime_cicd_pipeline
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontName "Helvetica Neue"
+skinparam defaultFontSize 12
+skinparam ArrowColor #555555
+skinparam NoteBackgroundColor #FFF9E6
+skinparam NoteBorderColor #E6C84A
+
+skinparam activity {
+  BackgroundColor #EEF4FB
+  BorderColor #4A7EBC
+  FontColor #1A1A2E
+  DiamondBackgroundColor #FFF3E0
+  DiamondBorderColor #E65100
+  DiamondFontColor #E65100
+}
+
+skinparam partition {
+  BackgroundColor #F7FBFF
+  BorderColor #4A7EBC
+  FontColor #1A1A2E
+  FontStyle bold
+}
+
+title DentTime — End-to-End CI/CD Pipeline\n<size:11><color:#777>(GitHub Actions · Docker · Airflow · MLflow · DVC · Prometheus/Grafana)</color></size>
+
+|#EBF5FB| Developer |
+|#E9F7EF| CI — GitHub Actions |
+|#FEF9E7| Feature Pipeline — Airflow |
+|#FDF2F8| ML Training — MLflow |
+|#FDFEFE| CD — Docker Compose |
+|#F0FFF4| Monitoring — Prometheus/Grafana |
+
+start
+
+|Developer|
+:Push code / Open Pull Request
+**[git push origin feature/xxx]**;
+
+|CI — GitHub Actions|
+partition "**Stage 1 · Lint & Static Analysis**" {
+  :Run **flake8 / ruff** on
+  src/, backend/, airflow/dags/;
+  if (Lint passes?) then (yes)
+  else (no)
+    #FFB3B3:❌ Fail — Block merge;
+    stop
+  endif
+}
+
+partition "**Stage 2 · Unit & DAG Tests**" {
+  fork
+    :Run **pytest tests/unit/**
+    (feature transformer, profiles);
+  fork again
+    :Run **pytest tests/dags/**
+    (DAG import & structure validation);
+  end fork
+  if (All tests pass?) then (yes)
+  else (no)
+    #FFB3B3:❌ Fail — Block merge;
+    stop
+  endif
+}
+
+partition "**Stage 3 · Docker Build Validation**" {
+  fork
+    :Build **Dockerfile.backend**
+    (FastAPI + uvicorn);
+  fork again
+    :Build **Dockerfile.frontend**
+    (Vite + React);
+  fork again
+    :Build **Dockerfile.airflow**
+    (Airflow + LocalExecutor + DVC);
+  end fork
+  if (All images build?) then (yes)
+  else (no)
+    #FFB3B3:❌ Fail — Fix Dockerfile;
+    stop
+  endif
+  :✅ Merge PR to **main**;
+}
+
+|Feature Pipeline — Airflow|
+partition "**Stage 4 · Feature Engineering Pipeline**" {
+  :Trigger **denttime_feature_engineering** DAG
+  via Airflow REST API or on schedule;
+  note right
+    Schedule: on new data arrival
+    or manual trigger post-merge
+  end note
+
+  :task_load_and_split
+  ──────────────────────────────
+  Read **data/raw/data.csv**
+  Split: train ≤ 2025-02 / test = 2025-04
+  Drop leakage columns
+  Write **train_split.parquet** / **test_split.parquet** → Interim;
+
+  fork
+    :task_build_doctor_profile
+    Compute per-doctor duration stats
+    → **doctor_profile.json**;
+  fork again
+    :task_build_clinic_profile
+    Compute per-clinic duration stats
+    → **clinic_profile.json**;
+  fork again
+    :task_build_treatment_encoding
+    Build treatment ordinal map
+    → **treatment_encoding.json**;
+  end fork
+
+  fork
+    :task_transform_train
+    Apply **FeatureTransformer**
+    → **features/features_train.parquet**;
+  fork again
+    :task_transform_test
+    Apply **FeatureTransformer**
+    → **features/features_test.parquet**;
+  end fork
+
+  :task_compute_feature_stats
+  Null rates, means, top-5 categoricals
+  → **features/feature_stats.json**;
+
+  :DVC commit & push
+  **make dvc-commit**
+  Version all parquet + JSON artifacts
+  to DVC remote (dvc-store volume)
+  ──────────────────────────────────
+  Saved artifacts:
+  · features/features_train.parquet
+  · features/features_test.parquet
+  · features/feature_stats.json
+  · src/features/artifacts/*.json;
+}
+
+note right
+  **DVC Remote (dvc-store volume)**
+  ┌─────────────────────────────────┐
+  │  features_train.parquet  [hash] │
+  │  features_test.parquet   [hash] │
+  │  feature_stats.json      [hash] │
+  │  doctor_profile.json     [hash] │
+  │  clinic_profile.json     [hash] │
+  │  treatment_encoding.json [hash] │
+  └─────────────────────────────────┘
+  ← Stage 4 writes here
+  → Stage 5 reads from here
+end note
+
+if (Feature pipeline success?) then (yes)
+else (no)
+  #FFB3B3:❌ Fail — Alert on-call
+  Check Airflow task logs;
+  stop
+endif
+
+|ML Training — MLflow|
+partition "**Stage 5 · Model Training & Experiment Tracking**" {
+  :DVC pull — load versioned features
+  ──────────────────────────────────
+  dvc pull features/features_train.parquet
+  dvc pull features/features_test.parquet
+  (pinned to commit hash from Stage 4)
+  Guarantees reproducibility: same data
+  that Airflow wrote is what training reads;
+
+  :Train **XGBoost Classifier**
+  Target: 15/30/45/60/90 min classes
+  Log params, tags, run to **MLflow**;
+
+  note right
+    MLflow tracks:
+    · n_estimators, max_depth, learning_rate
+    · Feature importance
+    · Confusion matrix artifact
+    · Run ID + dataset hash
+  end note
+
+  fork
+    :Evaluate **Standard Metrics**
+    Accuracy, Macro F1, Per-class F1;
+  fork again
+    :Evaluate **Business Metrics**
+    ⚠️ Under-estimation Rate (long Tx)
+    = P(predicted < actual | actual ≥ 60 min);
+  end fork
+}
+
+partition "**Stage 5b · Champion vs Challenger**" {
+  :Load current **Champion** model
+  from MLflow Model Registry;
+
+  if (Challenger Under-est. Rate\n< Champion threshold?) then (yes ✅)
+    if (Challenger F1 macro\n≥ Champion F1 - 0.02?) then (yes ✅)
+      :Promote Challenger → **Champion**
+      Update MLflow alias: @champion
+      Tag: **Production**;
+    else (no ❌)
+      :Reject challenger
+      Keep current champion;
+      note right
+        Log reason to MLflow
+        as a rejection tag
+      end note
+    endif
+  else (no ❌)
+    :Reject challenger
+    Under-estimation risk too high;
+  endif
+}
+
+|CD — Docker Compose|
+partition "**Stage 6 · Containerized Deployment**" {
+  :Pull champion model artifact from MLflow;
+
+  fork
+    :Build & tag **backend:latest**
+    COPY champion model + transformer
+    artifacts/ → /app/artifacts;
+  fork again
+    :Build & tag **frontend:latest**
+    vite build → static assets;
+  fork again
+    :Prepare **Airflow** container
+    with updated DAG + requirements;
+  end fork
+
+  :Run **docker-compose up -d**
+  ─────────────────────────────
+  · postgres:15 (Airflow metadata)
+  · airflow-webserver :8080
+  · airflow-scheduler
+  · backend (FastAPI) :8000
+  · frontend (Vite) :3000;
+
+  :Run **smoke tests**
+  POST /api/v1/predict → expect 200
+  Validate response schema;
+
+  if (Smoke tests pass?) then (yes)
+  else (no)
+    #FFB3B3:❌ Roll back to previous image;
+    stop
+  endif
+}
+
+|Monitoring — Prometheus/Grafana|
+partition "**Stage 7 · Observability & Drift Monitoring**" {
+  :Prometheus scrapes **/metrics** endpoint
+  (FastAPI instrumented);
+
+  fork
+    :Track **System Metrics**
+    Latency p50/p95/p99
+    Request throughput, Error rate;
+  fork again
+    :Track **ML Metrics**
+    Prediction class distribution
+    Confidence score distribution
+    Under-estimation Rate (live);
+  fork again
+    :Track **Data Drift Indicators**
+    Feature mean shift vs feature_stats.json
+    Clinic-level distribution changes;
+  end fork
+
+  if (Drift alert threshold\nbreached?) then (yes)
+    :🔔 Grafana alert fired
+    Notify on-call via webhook;
+    :Trigger Airflow DAG for
+    batch retraining (back to Stage 4);
+  else (no)
+    :✅ System healthy
+    Continue serving predictions;
+  endif
+}
+
+|Developer|
+:🟢 Deployment complete
+Prediction service live at :8000
+Airflow UI at :8080
+Grafana at :3000;
+
+stop
+
+legend right
+  |= Color |= Meaning |
+  |<#EBF5FB> Blue | Developer action |
+  |<#E9F7EF> Green | CI automated step |
+  |<#FEF9E7> Yellow | Airflow / data step |
+  |<#FDF2F8> Pink | ML / MLflow step |
+  |<#FDFEFE> White | Docker / CD step |
+  |<#F0FFF4> Mint | Monitoring step |
+  |<#FFB3B3> Red | Failure / halt |
+endlegend
+
+@enduml

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 12px; background: transparent; }
+  h2.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+
+  .diagram { width: 960px; margin: 0 auto; padding: 12px; }
+  .title { text-align: center; font-size: 15px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+  .subtitle { text-align: center; font-size: 11px; color: #666; margin-bottom: 12px; }
+
+  /* ── Shared grid: 6 equal columns ── */
+  .row { display: grid; grid-template-columns: repeat(6, 1fr); border-left: 1.5px solid #bbb; border-right: 1.5px solid #bbb; }
+
+  /* Header row */
+  .header-row { border-top: 1.5px solid #bbb; border-radius: 8px 8px 0 0; overflow: hidden; }
+  .header-row .cell { padding: 7px 5px; text-align: center; font-weight: 700; font-size: 10px; letter-spacing: 0.3px; border-right: 1px solid #ddd; border-bottom: 1.5px solid #bbb; }
+  .header-row .cell:last-child { border-right: none; }
+
+  /* Body rows */
+  .body-row .cell { padding: 6px 5px; border-right: 1px solid #ddd; border-bottom: 1px solid #eee; display: flex; flex-direction: column; gap: 4px; }
+  .body-row .cell:last-child { border-right: none; }
+
+  /* Footer / bottom border */
+  .footer-row { border-bottom: 1.5px solid #bbb; border-radius: 0 0 8px 8px; overflow: hidden; }
+  .footer-row .cell { border-bottom: none; }
+
+  /* Lane background colours */
+  .bg-dev  { background: #EBF5FB; }
+  .bg-ci   { background: #E9F7EF; }
+  .bg-af   { background: #FEF9E7; }
+  .bg-ml   { background: #FDF2F8; }
+  .bg-cd   { background: #F2F3F4; }
+  .bg-mon  { background: #EAFAF1; }
+
+  /* Header colours */
+  .hd-dev  { background: #D6EAF8; color: #154360; }
+  .hd-ci   { background: #D5F5E3; color: #1A5928; }
+  .hd-af   { background: #FCF3CF; color: #6E2F10; }
+  .hd-ml   { background: #F5CBA7; color: #6E2F10; }
+  .hd-cd   { background: #D6DBDF; color: #212F3C; }
+  .hd-mon  { background: #A9DFBF; color: #145A32; }
+
+  /* Stage cards */
+  .stage { border-radius: 5px; padding: 5px 6px; font-size: 10px; line-height: 1.4; }
+  .st-dev { background: #D6EAF8; border-left: 3px solid #2E86C1; }
+  .st-ci  { background: #D5F5E3; border-left: 3px solid #28B463; }
+  .st-af  { background: #FDEBD0; border-left: 3px solid #E59866; }
+  .st-ml  { background: #FDEDEC; border-left: 3px solid #E74C3C; }
+  .st-cd  { background: #EAF2FF; border-left: 3px solid #5B8DE3; }
+  .st-mon { background: #D5F5E3; border-left: 3px solid #27AE60; }
+  .st-ok  { background: #D5F5E3; border-left: 3px solid #27AE60; }
+  .st-dvc { background: #EDE0F5; border-left: 3px solid #7D3C98; }
+
+  .stage b { font-weight: 700; }
+  .stage small { font-size: 9px; color: #555; display: block; margin-top: 2px; }
+
+  /* Sub-grid for parallel tasks inside a cell */
+  .sub-row { display: flex; gap: 3px; }
+  .sub-row .stage { flex: 1; font-size: 9px; }
+
+  /* Badges */
+  .badge { display: inline-block; border-radius: 3px; padding: 1px 5px; font-size: 8.5px; font-weight: 700; margin-bottom: 2px; }
+  .bd-ci  { background: #28B463; color: #fff; }
+  .bd-af  { background: #E59866; color: #fff; }
+  .bd-ml  { background: #E74C3C; color: #fff; }
+  .bd-cd  { background: #5B8DE3; color: #fff; }
+  .bd-mon { background: #27AE60; color: #fff; }
+
+  /* Gates */
+  .gate { border-radius: 4px; padding: 3px 5px; text-align: center; font-size: 9.5px; font-weight: 700; }
+  .gt-pass { background: #D5F5E3; border: 1.5px solid #27AE60; color: #145A32; }
+  .gt-fail { background: #FDEDEC; border: 1.5px solid #E74C3C; color: #922B21; }
+  .gt-warn { background: #FEF9E7; border: 1.5px solid #D4AC0D; color: #7D6608; }
+  .gt-dvc  { background: #EDE0F5; border: 1.5px solid #7D3C98; color: #4A235A; text-align: center; font-size: 9.5px; font-weight: 700; }
+
+  /* DVC hand-off band */
+  .dvc-band { border-top: 2.5px dashed #7D3C98; border-bottom: 2.5px dashed #7D3C98; background: #F5EEF8; }
+  .dvc-band .cell { background: transparent; padding: 8px 6px; }
+  .dvc-artifact { font-family: monospace; font-size: 8.5px; color: #4A235A; background: #EAD9F5; border-radius: 3px; padding: 1px 4px; margin: 1px 0; display: block; }
+  .dvc-store { border: 1.5px solid #7D3C98; border-radius: 6px; padding: 6px; background: #fff; text-align: center; }
+  .dvc-arrow-right { font-size: 20px; color: #7D3C98; text-align: center; }
+
+  /* Legend */
+  .legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; justify-content: center; }
+  .legend-item { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #555; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+  .legend-dashed { width: 20px; height: 0; border-top: 2px dashed #7D3C98; }
+</style>
+</head>
+<body>
+<h2 class="sr-only">DentTime CI/CD Pipeline — 6-column swim-lane diagram with corrected stage alignment and DVC hand-off band</h2>
+<div class="diagram">
+  <div class="title">DentTime — End-to-End CI/CD Pipeline</div>
+  <div class="subtitle">GitHub Actions · Docker · Apache Airflow · MLflow · DVC · Prometheus / Grafana</div>
+
+  <!-- HEADER ROW -->
+  <div class="row header-row">
+    <div class="cell hd-dev">👨‍💻 Developer</div>
+    <div class="cell hd-ci">⚙️ CI — GitHub Actions</div>
+    <div class="cell hd-af">🌀 Feature Pipeline — Airflow</div>
+    <div class="cell hd-ml">🤖 ML Training — MLflow</div>
+    <div class="cell hd-cd">🐳 CD — Docker Compose</div>
+    <div class="cell hd-mon">📊 Monitoring</div>
+  </div>
+
+  <!-- ROW 1: Push + Stage 1 -->
+  <div class="row body-row">
+    <div class="cell bg-dev">
+      <div class="stage st-dev">
+        <b>Code Push / PR</b>
+        <small>git push feature/xxx<br>Open Pull Request → main</small>
+      </div>
+    </div>
+    <div class="cell bg-ci">
+      <span class="badge bd-ci">Stage 1</span>
+      <div class="stage st-ci">
+        <b>Lint & Static Analysis</b>
+        <small>flake8 / ruff on src/, backend/, airflow/dags/</small>
+      </div>
+      <div class="gate gt-fail">❌ Lint fail → block merge</div>
+    </div>
+    <div class="cell bg-af"></div>
+    <div class="cell bg-ml"></div>
+    <div class="cell bg-cd"></div>
+    <div class="cell bg-mon"></div>
+  </div>
+
+  <!-- ROW 2: Stage 2 -->
+  <div class="row body-row">
+    <div class="cell bg-dev"></div>
+    <div class="cell bg-ci">
+      <span class="badge bd-ci">Stage 2</span>
+      <div class="stage st-ci"><b>Unit & DAG Tests</b></div>
+      <div class="sub-row">
+        <div class="stage st-ci">pytest tests/unit/<br><span style="font-size:9px;color:#555">FeatureTransformer, Profiles</span></div>
+        <div class="stage st-ci">pytest tests/dags/<br><span style="font-size:9px;color:#555">DAG import & structure</span></div>
+      </div>
+      <div class="gate gt-fail">❌ Test fail → block merge</div>
+    </div>
+    <div class="cell bg-af"></div>
+    <div class="cell bg-ml"></div>
+    <div class="cell bg-cd"></div>
+    <div class="cell bg-mon"></div>
+  </div>
+
+  <!-- ROW 3: Stage 3 + merge -->
+  <div class="row body-row">
+    <div class="cell bg-dev">
+      <div class="stage st-ok">
+        <b>✅ Merge Approved</b>
+        <small>PR merged → main<br>Triggers Feature Pipeline + CD</small>
+      </div>
+    </div>
+    <div class="cell bg-ci">
+      <span class="badge bd-ci">Stage 3</span>
+      <div class="stage st-ci"><b>Docker Build Validation</b></div>
+      <div class="sub-row">
+        <div class="stage st-ci" style="font-size:9px">backend<br>FastAPI :8000</div>
+        <div class="stage st-ci" style="font-size:9px">frontend<br>Vite :3000</div>
+        <div class="stage st-ci" style="font-size:9px">airflow<br>LocalExec</div>
+      </div>
+      <div class="gate gt-pass">✅ All CI gates pass</div>
+    </div>
+    <div class="cell bg-af"></div>
+    <div class="cell bg-ml"></div>
+    <div class="cell bg-cd"></div>
+    <div class="cell bg-mon"></div>
+  </div>
+
+  <!-- ROW 4: Stage 4 (Airflow) -->
+  <div class="row body-row">
+    <div class="cell bg-dev"></div>
+    <div class="cell bg-ci"></div>
+    <div class="cell bg-af">
+      <span class="badge bd-af">Stage 4</span>
+      <div class="stage st-af"><b>Trigger DAG: denttime_feature_engineering</b><small>On new data arrival or merge to main</small></div>
+      <div class="stage st-af"><b>task_load_and_split</b><small>Read data/raw/data.csv → train (≤2025-02) / test (=2025-04)<br>Drop leakage cols → interim parquet</small></div>
+      <div class="sub-row">
+        <div class="stage st-af" style="font-size:9px"><b>Doctor Profile</b><br>→ doctor_profile.json</div>
+        <div class="stage st-af" style="font-size:9px"><b>Clinic Profile</b><br>→ clinic_profile.json</div>
+        <div class="stage st-af" style="font-size:9px"><b>Treatment Enc.</b><br>→ encoding.json</div>
+      </div>
+      <div class="sub-row">
+        <div class="stage st-af" style="font-size:9px"><b>Transform Train</b><br>→ features_train.parquet</div>
+        <div class="stage st-af" style="font-size:9px"><b>Transform Test</b><br>→ features_test.parquet</div>
+      </div>
+      <div class="stage st-af"><b>task_compute_feature_stats</b><small>Null rates, means, top-5 → feature_stats.json</small></div>
+    </div>
+    <div class="cell bg-ml"></div>
+    <div class="cell bg-cd"></div>
+    <div class="cell bg-mon"></div>
+  </div>
+
+  <!-- DVC HAND-OFF BAND — still 6 columns, no extra column -->
+  <div class="row body-row dvc-band">
+    <div class="cell" style="grid-column:1/3; background:transparent; align-items:center; justify-content:center;">
+      <div style="font-size:9px;color:#888;text-align:center;">← CI stages complete<br>Feature pipeline complete</div>
+    </div>
+
+    <!-- Airflow: DVC SAVE -->
+    <div class="cell" style="background:#EDE0F5; border-left:2px dashed #7D3C98;">
+      <div style="font-size:9px;font-weight:700;color:#7D3C98;margin-bottom:4px;">⬆ DVC SAVE — make dvc-commit</div>
+      <span class="dvc-artifact">features/features_train.parquet</span>
+      <span class="dvc-artifact">features/features_test.parquet</span>
+      <span class="dvc-artifact">features/feature_stats.json</span>
+      <span class="dvc-artifact">artifacts/doctor_profile.json</span>
+      <span class="dvc-artifact">artifacts/clinic_profile.json</span>
+      <span class="dvc-artifact">artifacts/treatment_encoding.json</span>
+      <div style="margin-top:5px;text-align:center;">
+        <div class="dvc-store">
+          <div style="font-size:16px;">🗄️</div>
+          <div style="font-size:8.5px;font-weight:700;color:#7D3C98;">DVC Remote</div>
+          <div style="font-size:8px;color:#6C3483;">(dvc-store volume)<br>Git-tracked .dvc pointers<br>pinned commit hash</div>
+        </div>
+        <div style="font-size:18px;color:#7D3C98;margin:2px 0;">→</div>
+      </div>
+    </div>
+
+    <!-- ML: DVC LOAD -->
+    <div class="cell" style="background:#EDE0F5; border-right:2px dashed #7D3C98;">
+      <div style="font-size:9px;font-weight:700;color:#E74C3C;margin-bottom:4px;">⬇ DVC PULL — dvc pull</div>
+      <span class="dvc-artifact">features_train.parquet ← same hash</span>
+      <span class="dvc-artifact">features_test.parquet  ← same hash</span>
+      <div style="font-size:8.5px;color:#555;margin-top:4px;">Training always reads<br>exact data Airflow wrote.<br>Dataset hash logged to<br>MLflow run → traceable.</div>
+    </div>
+
+    <div class="cell" style="grid-column:5/7; background:transparent; align-items:center; justify-content:center;">
+      <div style="font-size:9px;color:#888;text-align:center;">← waiting for<br>champion model</div>
+    </div>
+  </div>
+
+  <!-- ROW 5: Stage 5 ML Training -->
+  <div class="row body-row">
+    <div class="cell bg-dev"></div>
+    <div class="cell bg-ci"></div>
+    <div class="cell bg-af">
+      <div class="gate gt-pass">✅ Features versioned<br>→ trigger training</div>
+    </div>
+    <div class="cell bg-ml">
+      <span class="badge bd-ml">Stage 5</span>
+      <div class="stage st-ml"><b>Train XGBoost Classifier</b><small>Target: 15/30/45/60/90 min classes<br>Log params, metrics, artifacts to MLflow<br>Dataset hash → MLflow run tag</small></div>
+      <div class="sub-row">
+        <div class="stage st-ml" style="font-size:9px"><b>Standard Metrics</b><br>Accuracy<br>Macro F1<br>Per-class F1</div>
+        <div class="stage" style="background:#FEF9E7;border-left:3px solid #E59866;flex:1;font-size:9px"><b>⚠️ Business Metric</b><br>Under-est. Rate<br>(long Tx ≥ 60 min)<br><i>primary gate</i></div>
+      </div>
+      <div class="stage" style="background:#FEF9E7;border-left:3px solid #7D3C98;"><b>Champion vs. Challenger</b><small>Gate 1: Under-est. Rate &lt; threshold<br>Gate 2: Macro F1 ≥ champion − 0.02<br>→ Promote to @champion (Production)</small></div>
+      <div class="gate gt-pass">✅ Promoted → @champion tag</div>
+      <div class="gate gt-fail">❌ Rejected → keep champion</div>
+    </div>
+    <div class="cell bg-cd"></div>
+    <div class="cell bg-mon"></div>
+  </div>
+
+  <!-- ROW 6: Stage 6 CD -->
+  <div class="row body-row">
+    <div class="cell bg-dev"></div>
+    <div class="cell bg-ci"></div>
+    <div class="cell bg-af"></div>
+    <div class="cell bg-ml"></div>
+    <div class="cell bg-cd">
+      <span class="badge bd-cd">Stage 6</span>
+      <div class="stage st-cd"><b>Pull Champion from MLflow Registry</b><small>Download model artifact → artifacts/</small></div>
+      <div class="sub-row">
+        <div class="stage st-cd" style="font-size:9px"><b>backend</b><br>FastAPI +<br>champion model<br>+ transformer</div>
+        <div class="stage st-cd" style="font-size:9px"><b>frontend</b><br>Vite build<br>static assets</div>
+        <div class="stage st-cd" style="font-size:9px"><b>airflow</b><br>Updated DAG<br>+ requirements</div>
+      </div>
+      <div class="stage st-cd"><b>docker-compose up -d</b><small>postgres:15 · airflow-webserver :8080<br>airflow-scheduler · backend :8000 · frontend :3000</small></div>
+      <div class="stage st-cd"><b>Smoke Tests</b><small>POST /api/v1/predict → 200 + schema check</small></div>
+      <div class="gate gt-pass">✅ Smoke pass → Deployed</div>
+      <div class="gate gt-fail">❌ Fail → rollback image</div>
+    </div>
+    <div class="cell bg-mon"></div>
+  </div>
+
+  <!-- ROW 7: Stage 7 Monitoring + Deployed -->
+  <div class="row body-row footer-row">
+    <div class="cell bg-dev">
+      <div style="flex:1"></div>
+      <div class="stage st-ok">
+        <b>🟢 Live!</b>
+        <small>API :8000<br>Airflow :8080<br>Grafana :3000</small>
+      </div>
+    </div>
+    <div class="cell bg-ci"></div>
+    <div class="cell bg-af">
+      <div class="stage st-af"><b>Batch Retraining</b><small>Drift alert → re-run feature DAG<br>(loops back to Stage 4)</small></div>
+    </div>
+    <div class="cell bg-ml"></div>
+    <div class="cell bg-cd"></div>
+    <div class="cell bg-mon">
+      <span class="badge bd-mon">Stage 7</span>
+      <div class="stage st-mon"><b>Prometheus scrapes /metrics</b></div>
+      <div class="sub-row">
+        <div class="stage st-mon" style="font-size:9px"><b>System</b><br>Latency p50/95/99<br>Error rate</div>
+        <div class="stage" style="background:#FEF9E7;border-left:3px solid #E59866;flex:1;font-size:9px"><b>⚠️ ML</b><br>Under-est. Rate (live)<br>Confidence dist.</div>
+        <div class="stage st-mon" style="font-size:9px"><b>Data Drift</b><br>Feature mean<br>vs stats.json</div>
+      </div>
+      <div class="gate gt-warn">🔔 Drift alert → Grafana webhook → retrain</div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#2E86C1"></div>Developer</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#28B463"></div>CI (GitHub Actions)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#E59866"></div>Feature Pipeline (Airflow)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#E74C3C"></div>ML Training (MLflow)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#5B8DE3"></div>Deployment (Docker)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#27AE60"></div>Monitoring (Prometheus/Grafana)</div>
+    <div class="legend-item"><div class="legend-dashed"></div>DVC version hand-off</div>
+  </div>
+</div>
+</body>
+</html>

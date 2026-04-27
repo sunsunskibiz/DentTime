@@ -5,6 +5,8 @@ x-airflow-common: &airflow-common
   build:
     context: ..
     dockerfile: docker/Dockerfile.airflow
+  env_file:
+    - .env
   environment:
     AIRFLOW__CORE__EXECUTOR: LocalExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
@@ -43,13 +45,18 @@ services:
       start_period: 30s
 
   mlflow:
-    image: python:3.11-slim
-    command:
-      - bash
-      - -c
-      - "pip install --quiet mlflow psycopg2-binary && mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri postgresql+psycopg2://airflow:airflow@postgres/mlflow --default-artifact-root /mlflow/artifacts --serve-artifacts --allowed-hosts '*'"
+    build:
+      context: .
+      dockerfile: Dockerfile.mlflow
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri postgresql+psycopg2://airflow:airflow@postgres/mlflow
+      --default-artifact-root /mlflow/artifacts
+      --serve-artifacts
     ports:
-      - "5000:5000"
+      - "5001:5000"
     volumes:
       - mlflow-artifacts:/mlflow/artifacts
     depends_on:
