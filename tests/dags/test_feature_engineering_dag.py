@@ -1,10 +1,10 @@
-# tests/dags/test_feature_engineering_dag.py
 import ast
 from pathlib import Path
 
 DAG_PATH = Path("airflow/dags/feature_engineering_dag.py")
 
 EXPECTED_TASKS = [
+    "task_pull_raw_data",
     "task_load_and_split",
     "task_build_doctor_profile",
     "task_build_clinic_profile",
@@ -33,7 +33,7 @@ def test_uses_schedule_not_schedule_interval():
     assert "schedule=None" in source
 
 
-def test_has_all_seven_tasks():
+def test_has_all_eight_tasks():
     source = DAG_PATH.read_text()
     for task_id in EXPECTED_TASKS:
         assert task_id in source, f"Missing task_id: {task_id}"
@@ -45,10 +45,12 @@ def test_no_xcom_usage():
     assert "xcom_pull" not in source, "XCom not allowed — use file-based communication"
 
 
-def test_no_dvc_or_git_in_dag():
+def test_pull_task_calls_dvc_utils():
     source = DAG_PATH.read_text()
-    assert "dvc" not in source.lower(), "No DVC operations inside DAG tasks"
-    assert "subprocess" not in source, "No subprocess calls — DVC is a host-side concern"
+    assert "subprocess" not in source, \
+        "No subprocess calls in DAG — delegate to src.features.dvc_utils"
+    assert "dvc_utils" in source, \
+        "_task_pull_raw_data must import from src.features.dvc_utils"
 
 
 def test_path_constants_at_module_level():
@@ -70,6 +72,18 @@ def test_sys_path_insert_in_each_task():
     for fn in task_func_names:
         assert fn in funcs_with_insert, \
             f"{fn} is missing sys.path.insert(0, str(PROJECT_ROOT))"
+
+
+def test_pull_task_is_first():
+    source = DAG_PATH.read_text()
+    assert "pull_raw_data >> load_and_split" in source, \
+        "task_pull_raw_data must be wired before task_load_and_split"
+
+
+def test_load_and_split_trigger_rule():
+    source = DAG_PATH.read_text()
+    assert "NONE_FAILED_MIN_ONE_SUCCESS" in source, \
+        "task_load_and_split must use TriggerRule.NONE_FAILED_MIN_ONE_SUCCESS"
 
 
 def test_dependency_wiring():

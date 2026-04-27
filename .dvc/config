@@ -2,3 +2,6 @@
     remote = localremote
 ['remote "localremote"']
     url = /tmp/dvc-store-denttime
+['remote "dagshub-raw"']
+    url = https://dagshub.com/natchyunicorn/denttime.dvc
+    auth = basic

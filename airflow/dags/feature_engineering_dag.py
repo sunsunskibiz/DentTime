@@ -4,6 +4,7 @@ from pathlib import Path
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
+from airflow.utils.trigger_rule import TriggerRule
 
 # ---------------------------------------------------------------------------
 # Path constants — defined at module level, referenced by all task functions
@@ -18,6 +19,21 @@ RAW_CSV      = Path("/opt/airflow/data/raw/data.csv")
 # ---------------------------------------------------------------------------
 # Task functions
 # ---------------------------------------------------------------------------
+
+def _task_pull_raw_data():
+    sys.path.insert(0, str(PROJECT_ROOT))
+    from airflow.exceptions import AirflowSkipException
+    from src.features.dvc_utils import pull_raw_data
+
+    status = pull_raw_data(
+        dvc_file="data/published.dvc",
+        local_csv=str(RAW_CSV),
+        remote="dagshub-raw",
+        project_root=str(PROJECT_ROOT),
+    )
+    if status == "skipped":
+        raise AirflowSkipException("DVC pull failed; using existing local data/raw/data.csv")
+
 
 def _task_load_and_split():
     sys.path.insert(0, str(PROJECT_ROOT))
@@ -163,9 +179,14 @@ with DAG(
     tags=["feature-engineering"],
 ) as dag:
 
+    pull_raw_data = PythonOperator(
+        task_id="task_pull_raw_data",
+        python_callable=_task_pull_raw_data,
+    )
     load_and_split = PythonOperator(
         task_id="task_load_and_split",
         python_callable=_task_load_and_split,
+        trigger_rule=TriggerRule.NONE_FAILED_MIN_ONE_SUCCESS,
     )
     build_doctor_profile = PythonOperator(
         task_id="task_build_doctor_profile",
@@ -193,6 +214,7 @@ with DAG(
     )
 
     # Dependency wiring
+    pull_raw_data >> load_and_split
     load_and_split >> [build_doctor_profile, build_clinic_profile, build_treatment_encoding]
     [build_doctor_profile, build_clinic_profile, build_treatment_encoding] >> transform_train
     [build_doctor_profile, build_clinic_profile, build_treatment_encoding] >> transform_test
