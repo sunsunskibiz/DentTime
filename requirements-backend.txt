@@ -14,3 +14,5 @@ sqlalchemy==2.0.35
 prometheus-client==0.21.0
 python-multipart==0.0.9
 httpx==0.27.2
+dvc>=2.0
+dill==0.4.1
