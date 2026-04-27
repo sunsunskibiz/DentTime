@@ -1,0 +1,113 @@
+# ============================================================
+# DentTime — Airflow + MLflow Stack
+# ============================================================
+x-airflow-common: &airflow-common
+  build:
+    context: ..
+    dockerfile: docker/Dockerfile.airflow
+  environment:
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CORE__FERNET_KEY: ''
+    AIRFLOW__WEBSERVER__SECRET_KEY: 'denttime-local-dev-secret'
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    MLFLOW_TRACKING_URI: http://mlflow:5000
+  volumes:
+    - ../:/opt/airflow/project
+    - ../airflow/dags:/opt/airflow/dags
+    - ../data/raw:/opt/airflow/data/raw:ro
+    - denttime-interim:/opt/airflow/data/interim
+    - denttime-dvc-store:/opt/airflow/dvc-store
+    - mlflow-artifacts:/mlflow/artifacts
+  depends_on:
+    postgres:
+      condition: service_healthy
+    mlflow:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      retries: 10
+      start_period: 30s
+
+  mlflow:
+    image: python:3.11-slim
+    command:
+      - bash
+      - -c
+      - "pip install --quiet mlflow psycopg2-binary && mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri postgresql+psycopg2://airflow:airflow@postgres/mlflow --default-artifact-root /mlflow/artifacts --serve-artifacts --allowed-hosts '*'"
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow-artifacts:/mlflow/artifacts
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://0.0.0.0:5000/health')"]
+      interval: 20s
+      retries: 10
+      start_period: 120s
+    restart: unless-stopped
+
+  airflow-init:
+    <<: *airflow-common
+    user: root
+    command:
+      - bash
+      - -c
+      - |
+          set -e
+          chown -R 50000:0 /opt/airflow/data/interim /opt/airflow/dvc-store
+          su -s /bin/bash airflow -c '
+            set -e
+            airflow db migrate
+            airflow users list | grep -q admin || \
+              airflow users create \
+                --username admin --password admin \
+                --role Admin \
+                --email admin@denttime.local \
+                --firstname Admin --lastname Admin
+            cd /opt/airflow/project && \
+              (dvc remote add -d localremote /opt/airflow/dvc-store --local --force \
+               || echo "DVC remote setup skipped")
+          '
+    restart: "no"
+
+  airflow-webserver:
+    <<: *airflow-common
+    command: airflow webserver
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      retries: 3
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: airflow scheduler
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+volumes:
+  postgres-db:
+  denttime-interim:
+  denttime-dvc-store:
+  mlflow-artifacts:
