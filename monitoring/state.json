@@ -1,34 +1,35 @@
 {
   "feature_psi": {
-    "treatment_class": 4.6575647789206025,
-    "composite_treatment_flag": 0.06830136361714007,
+    "treatment_class": 2.298580022767379,
+    "composite_treatment_flag": 0.18668948921535067,
     "has_tooth_no": 10.39775983516138,
-    "tooth_count": 3.6219189418348465,
-    "is_area_treatment": 0.08233537772019894,
-    "surface_count": 0.616947499100291,
-    "total_amount": 11.03139117387325,
-    "has_notes": 0.10183134877345335,
-    "appt_day_of_week": 7.293904767183501,
-    "appt_hour_bucket": 6.199452420726382,
+    "tooth_count": 3.212492878057966,
+    "is_area_treatment": 0.21397883913822494,
+    "surface_count": 6.857987085902312,
+    "total_amount": 9.059497251864133,
+    "has_notes": 0.614297182477155,
+    "appt_day_of_week": 5.078041804441942,
+    "appt_hour_bucket": 15.717851000162057,
     "is_first_case": 0.3320822229504347,
-    "has_dentist_id": 7.261768771657267,
+    "has_dentist_id": 0.19148172862967588,
     "appointment_rank_in_day": 4.974971053860303,
     "clinic_median_duration": 4.535323109434887,
-    "clinic_pct_long": 11.218734335870973,
-    "doctor_median_duration": 0.4110484184239057,
-    "doctor_pct_long": 4.396317992832204
+    "clinic_pct_long": 11.402454690191036,
+    "doctor_median_duration": 0.5904455383786876,
+    "doctor_pct_long": 1.8111852280218945
   },
   "prediction_ratio": {
-    "15": 0.2391304347826087,
-    "30": 0.7391304347826086,
-    "60": 0.021739130434782608
+    "15": 0.0658682634730539,
+    "30": 0.20958083832335328,
+    "60": 0.005988023952095809,
+    "105": 0.718562874251497
   },
-  "input_missing_rate": 0.16279069767441862,
-  "treatment_unknown_rate": 0.046511627906976744,
+  "input_missing_rate": 0.33658536585365856,
+  "treatment_unknown_rate": 0.018292682926829267,
   "treatment_unknown_rate_baseline": 0.1446605254179461,
   "appt_hour_bucket_sentinel_rate": 0.0,
   "appt_hour_bucket_sentinel_rate_baseline": 0.10691518971430623,
-  "macro_f1": 0.5,
-  "mae_minutes": 0.36363636363636365,
-  "under_estimation_rate": 0.0
+  "macro_f1": 0.4666666666666666,
+  "mae_minutes": 22.931297709923665,
+  "under_estimation_rate": 0.3053435114503817
 }
