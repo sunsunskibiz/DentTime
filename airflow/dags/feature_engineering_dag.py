@@ -186,7 +186,7 @@ with DAG(
     load_and_split = PythonOperator(
         task_id="task_load_and_split",
         python_callable=_task_load_and_split,
-        trigger_rule=TriggerRule.NONE_FAILED_MIN_ONE_SUCCESS,
+        trigger_rule=TriggerRule.NONE_FAILED,
     )
     build_doctor_profile = PythonOperator(
         task_id="task_build_doctor_profile",

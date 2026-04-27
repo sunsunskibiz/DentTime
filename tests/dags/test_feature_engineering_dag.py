@@ -82,8 +82,8 @@ def test_pull_task_is_first():
 
 def test_load_and_split_trigger_rule():
     source = DAG_PATH.read_text()
-    assert "NONE_FAILED_MIN_ONE_SUCCESS" in source, \
-        "task_load_and_split must use TriggerRule.NONE_FAILED_MIN_ONE_SUCCESS"
+    assert "NONE_FAILED" in source, \
+        "task_load_and_split must use TriggerRule.NONE_FAILED"
 
 
 def test_dependency_wiring():

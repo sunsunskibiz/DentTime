@@ -51,7 +51,7 @@ services:
       - -c
       - "pip install --quiet mlflow psycopg2-binary && mlflow server --host 0.0.0.0 --port 5000 --backend-store-uri postgresql+psycopg2://airflow:airflow@postgres/mlflow --default-artifact-root /mlflow/artifacts --serve-artifacts --allowed-hosts '*'"
     ports:
-      - "5000:5000"
+      - "5001:5000"
     volumes:
       - mlflow-artifacts:/mlflow/artifacts
     depends_on:
