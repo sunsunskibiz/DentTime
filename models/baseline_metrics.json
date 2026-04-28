@@ -1,19 +1,28 @@
 {
-  "model_version": "denttime_xgb_retrain",
-  "macro_f1": 0.4101,
-  "mae_minutes": 8.42,
-  "under_estimation_rate": 0.0961,
-  "class_labels": [
-    15,
-    30,
-    45,
-    60,
-    90,
-    105
+  "macro_f1": 0.4059,
+  "weighted_f1": 0.7163,
+  "mae": 8.71,
+  "feature_set": "pruned",
+  "features_used": [
+    "total_amount",
+    "treatment_class",
+    "clinic_median_duration",
+    "clinic_pct_long",
+    "doctor_pct_long",
+    "tooth_count",
+    "has_tooth_no"
   ],
-  "degradation_thresholds": {
-    "macro_f1_drop": 0.05,
-    "under_est_rate_max": 0.2,
-    "mae_increase_max": 5
-  }
+  "features_dropped": [
+    "appointment_rank_in_day",
+    "surface_count",
+    "has_notes",
+    "composite_treatment_flag",
+    "appt_day_of_week",
+    "doctor_median_duration",
+    "appt_hour_bucket",
+    "is_first_case",
+    "is_area_treatment",
+    "has_dentist_id"
+  ],
+  "mlflow_run_id": "36fc986c61e04d608b7818f31736b00a"
 }

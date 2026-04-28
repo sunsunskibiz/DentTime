@@ -1,21 +1,23 @@
 {
   "feature_cols": [
-    "treatment_class",
-    "composite_treatment_flag",
-    "has_tooth_no",
-    "tooth_count",
-    "is_area_treatment",
-    "surface_count",
     "total_amount",
-    "has_notes",
-    "appt_day_of_week",
-    "appt_hour_bucket",
-    "is_first_case",
-    "has_dentist_id",
-    "appointment_rank_in_day",
+    "treatment_class",
     "clinic_median_duration",
     "clinic_pct_long",
+    "doctor_pct_long",
+    "tooth_count",
+    "has_tooth_no"
+  ],
+  "dropped": [
+    "appointment_rank_in_day",
+    "surface_count",
+    "has_notes",
+    "composite_treatment_flag",
+    "appt_day_of_week",
     "doctor_median_duration",
-    "doctor_pct_long"
+    "appt_hour_bucket",
+    "is_first_case",
+    "is_area_treatment",
+    "has_dentist_id"
   ]
 }

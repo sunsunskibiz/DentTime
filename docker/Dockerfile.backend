@@ -11,7 +11,10 @@ COPY artifacts ./artifacts
 COPY monitoring ./monitoring
 COPY run_metrics_loop.py ./run_metrics_loop.py
 COPY .dvc ./.dvc
-COPY tmp/dvc-store-denttime ./dvc-store
+COPY .git ./.git
+
+# fallback model
+COPY models ./models
 
 EXPOSE 8000
 

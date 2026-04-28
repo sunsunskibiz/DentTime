@@ -23,6 +23,22 @@ ARTIFACTS_DIR = PROJECT_ROOT / "artifacts"
 MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000")
 MODEL_NAME = "denttime_duration_classifier"
 
+def run_cmd(cmd, cwd):
+    import subprocess
+
+    result = subprocess.run(
+        cmd,
+        cwd=str(cwd),
+        capture_output=True,
+        text=True,
+    )
+
+    print("CMD:", " ".join(cmd))
+    print("STDOUT:", result.stdout)
+    print("STDERR:", result.stderr)
+
+    result.check_returncode()
+    return result
 # ─────────────────────────────────────────────────────────────────────────
 # Task 1: Compare Models
 # ─────────────────────────────────────────────────────────────────────────
@@ -281,9 +297,9 @@ def _task_deploy_champion(**context):
     decision = context['ti'].xcom_pull(key='decision', task_ids='task_decide_promotion')
     should_promote = decision["should_promote"]
     
-    # if not should_promote:
-    #     print("No promotion, skipping deployment")
-    #     return
+    if not should_promote:
+        print("No promotion, skipping deployment")
+        return
     
     mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
     client = MlflowClient()
@@ -307,9 +323,17 @@ def _task_deploy_champion(**context):
     
     print(f"Model saved to {model_path}")
     
-    # DVC add and push (using existing config from .dvc/config)
-    subprocess.run(["dvc", "add", str(model_path.relative_to(PROJECT_ROOT))], cwd=str(PROJECT_ROOT), check=True)
-    subprocess.run(["dvc", "push"], cwd=str(PROJECT_ROOT), check=True)
+    rel_model_path = str(model_path.relative_to(PROJECT_ROOT))
+
+    run_cmd(
+        ["dvc", "add", "--force", rel_model_path],
+        cwd=PROJECT_ROOT,
+    )
+
+    run_cmd(
+        ["dvc", "push", "-r", "localremote"],
+        cwd=PROJECT_ROOT,
+    )
     
     print("Champion model deployed and versioned with DVC")
     
