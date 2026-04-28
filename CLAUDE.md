@@ -131,13 +131,13 @@ The inference backend (`backend/app/routers/predict.py`) uses `index_to_class` t
 - `POST /actual` → mock in-memory logging (no persistence)
 - `GET /options` → returns available doctors, clinics, treatments from profile JSONs
 
-**`Monitoring-Alerting/app/`** — monitoring API:
+**`backend/app/`** (serving profile — `api` service) — also handles monitoring persistence:
 - Real SQLite persistence (`data/denttime.db`)
 - Same `/predict` and `/actual` endpoints but writes to SQLite
 - `GET /metrics` → Prometheus exposition format (reads from `monitoring/state.json`)
-- `monitoring/update_metrics.py` runs every 15 s via a sidecar container; computes PSI, F1, MAE from SQLite and writes `state.json`
+- `metrics_updater` service runs `run_metrics_loop.py` every 15 s; computes PSI, F1, MAE from SQLite and writes `state.json`
 
-### Monitoring Alert Rules (`Monitoring-Alerting/prometheus/alerts.yml`)
+### Monitoring Alert Rules (`prometheus/alerts.yml`)
 
 | Alert | Condition | Severity |
 |---|---|---|
