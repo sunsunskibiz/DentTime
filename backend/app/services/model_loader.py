@@ -78,7 +78,7 @@ def load_model():
         print("✅ Using DVC model")
         loaded = joblib.load(MODEL_PATH)
 
-    if FALLBACK_PATH.exists():
+    elif FALLBACK_PATH.exists():
         print("⚠️ Using fallback model")
         loaded = joblib.load(FALLBACK_PATH)
 
