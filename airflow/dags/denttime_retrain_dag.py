@@ -12,9 +12,9 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
 
-PROJECT_ROOT = Path("/opt/airflow/project")
-FEATURES     = PROJECT_ROOT / "features"
-MODEL_DIR    = PROJECT_ROOT / "models"
+PROJECT_ROOT = Path(os.getenv("PROJECT_ROOT", "/opt/airflow/project"))
+FEATURES     = Path(os.getenv("FEATURES_DIR", str(PROJECT_ROOT / "features")))
+MODEL_DIR    = Path(os.getenv("MODEL_DIR", str(PROJECT_ROOT / "models")))
 
 MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://mlflow:5000")
 MLFLOW_EXPERIMENT   = "DentTime_Duration_Prediction"
@@ -49,17 +49,36 @@ def _score(model, le, X_test, y_test):
 
 
 # ---------------------------------------------------------------------------
+# Task helpers
+# ---------------------------------------------------------------------------
+
+def _assert_feature_files_exist():
+    missing = []
+    for file_name in ("features_train.parquet", "features_test.parquet"):
+        path = FEATURES / file_name
+        if not path.exists():
+            missing.append(path)
+    if missing:
+        raise FileNotFoundError(
+            "Missing feature files for retrain. Run the feature engineering DAG first: "
+            "denttime_feature_engineering, or generate features with feature_engineering.py. "
+            f"Missing: {', '.join(str(p) for p in missing)}"
+        )
+
+
+# ---------------------------------------------------------------------------
 # Task 1: Load & validate features
 # ---------------------------------------------------------------------------
 def _task_load_features():
     import pandas as pd
     MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    _assert_feature_files_exist()
     train_df = pd.read_parquet(FEATURES / "features_train.parquet")
     test_df  = pd.read_parquet(FEATURES / "features_test.parquet")
     if len(train_df) == 0:
-        raise ValueError("features_train.parquet ว่างเปล่า")
+        raise ValueError("features_train.parquet ว่างเปล่า — รัน feature_engineering DAG ก่อน")
     if len(test_df) == 0:
-        raise ValueError("features_test.parquet ว่างเปล่า")
+        raise ValueError("features_test.parquet ว่างเปล่า — รัน feature_engineering DAG ก่อน")
     print(f"Train: {len(train_df):,} | Test: {len(test_df):,}")
 
 

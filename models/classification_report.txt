@@ -1,0 +1,15 @@
+Feature set: pruned (7 features)
+Dropped: ['appointment_rank_in_day', 'surface_count', 'has_notes', 'composite_treatment_flag', 'appt_day_of_week', 'doctor_median_duration', 'appt_hour_bucket', 'is_first_case', 'is_area_treatment', 'has_dentist_id']
+
+              precision    recall  f1-score   support
+
+          15       0.82      0.80      0.81     30608
+          30       0.87      0.64      0.74     44961
+          45       0.12      0.49      0.20      2158
+          60       0.35      0.44      0.39      6354
+          90       0.10      0.40      0.16       863
+         105       0.08      0.49      0.14       348
+
+    accuracy                           0.68     85292
+   macro avg       0.39      0.54      0.41     85292
+weighted avg       0.78      0.68      0.72     85292

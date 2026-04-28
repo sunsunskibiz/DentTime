@@ -11,6 +11,7 @@ services:
       - ../../artifacts:/app/artifacts
       - ../../src/features/artifacts:/app/src/features/artifacts
       - ../../monitoring:/app/monitoring
+      - denttime-dvc-store:/opt/airflow/dvc-store
 
   prometheus:
     image: prom/prometheus:v2.54.1
@@ -63,3 +64,6 @@ services:
       - api
     environment:
       - VITE_API_URL=http://localhost:8000
+
+volumes:
+  denttime-dvc-store:

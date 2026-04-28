@@ -55,15 +55,16 @@ services:
       --backend-store-uri postgresql+psycopg2://airflow:airflow@postgres/mlflow
       --default-artifact-root /mlflow/artifacts
       --serve-artifacts
+      --allowed-hosts '*'
     ports:
-      - "5001:5000"
+      - "5000:5000"
     volumes:
       - mlflow-artifacts:/mlflow/artifacts
     depends_on:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://0.0.0.0:5000/health')"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
       interval: 20s
       retries: 10
       start_period: 120s
@@ -78,6 +79,7 @@ services:
       - |
           set -e
           chown -R 50000:0 /opt/airflow/data/interim /opt/airflow/dvc-store
+          chown -R 50000:0 /opt/airflow/data/interim /opt/airflow/dvc-store /mlflow/artifacts
           su -s /bin/bash airflow -c '
             set -e
             airflow db migrate

@@ -1,10 +1,6 @@
 FROM python:3.11-slim
 
-# Copy the requirements file
-COPY requirements-mlflow.txt /requirements-mlflow.txt
-
-# Install necessary packages for MLflow and PostgreSQL connection
-RUN pip install --no-cache-dir -r /requirements-mlflow.txt
+RUN pip install mlflow>=2.12 psycopg2-binary
 
 # Expose the MLflow port
 EXPOSE 5000
