@@ -1,5 +1,5 @@
 param(
-    [string]$ApiBase = "http://localhost:8000",
+    [string]$ApiBase = "http://localhost:8001",
     [int]$Total = 80,
     [int]$DelayMs = 120,
     [switch]$SkipActual,
@@ -196,7 +196,7 @@ foreach ($feature in $features) {
 Write-Step "Open these pages for the teacher demo"
 Write-Host "Grafana dashboard : http://localhost:3000/d/denttime-prometheus/denttime-monitoring-dashboard?orgId=1"
 Write-Host "Prometheus alerts : http://localhost:9090/alerts"
-Write-Host "Backend metrics   : http://localhost:8000/metrics"
+Write-Host "Backend metrics   : http://localhost:8001/metrics"
 
 Write-Host ""
 Write-Host "Demo explanation:"

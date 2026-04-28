@@ -212,3 +212,44 @@ npm run dev     # dev server :5173
 npm run lint    # eslint
 npm run build   # tsc + vite build
 ```
+
+---
+
+## Monitoring Demo Scripts
+
+Two scripts simulate monitoring degradation for classroom / grader demos. Both require the serving stack to be running (`make up-serve`, backend at `http://localhost:8000`).
+
+| Script | What it does | Alerts triggered |
+|---|---|---|
+| `run_data_diff_demo` | 80 requests with unseen treatments + extreme values | `FeatureDriftHigh`, `MissingRateHigh` |
+| `run_critical_alert_demo` | 170 requests with wrong actual labels in two batches | `MacroF1Drop`, `UnderEstimationHigh` |
+
+**macOS / Linux** (requires `curl` and `python3`, both built-in on macOS):
+
+```bash
+# Data drift demo — PSI > 0.25 on several features
+bash scripts/run_data_diff_demo.sh
+
+# Critical alert demo — Macro F1 drop + under-estimation
+bash scripts/run_critical_alert_demo.sh
+```
+
+**Windows (PowerShell)**:
+
+```powershell
+# Data drift demo
+scripts\run_data_diff_demo.bat
+
+# Critical alert demo
+scripts\run_critical_alert_demo.bat
+```
+
+After the script finishes, open:
+
+| Page | URL |
+|---|---|
+| Grafana dashboard | http://localhost:3000/d/denttime-prometheus/denttime-monitoring-dashboard |
+| Prometheus alerts | http://localhost:9090/alerts |
+| Raw metrics | http://localhost:8000/metrics |
+
+> **Note:** If Prometheus shows `Pending` instead of `Firing`, wait ~1 minute — alert rules use `for: 1m`.
