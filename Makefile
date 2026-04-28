@@ -14,6 +14,7 @@ dvc-commit:
 	@echo ""
 	@echo "DVC files staged. Now run:"
 	@echo "  git commit -m 'feat: update features $(shell date +%Y-%m-%d)'"
+
 .PHONY: up up-train up-serve down validate
 
 up: ## Start all stacks (demo mode)
