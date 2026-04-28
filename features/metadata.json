@@ -1,0 +1,25 @@
+{
+  "date_range": ["2025-01", "2025-02", "2025-04"],
+  "known_gap": "2025-03 absent from source data",
+  "train_rows": 167067,
+  "test_rows": 85292,
+  "label_column": "duration_class",
+  "label_classes": [15, 30, 45, 60, 90, 105],
+  "binning_strategy": "ceiling — maps to nearest standard class >= actual duration",
+  "feature_count": 17,
+  "leakage_excluded": ["checkin_delay_min", "tx_record_offset_min", "receipt_offset_min"],
+  "zero_variance_excluded": ["treatment_recorded"],
+  "near_zero_variance_excluded": ["receipt_issued"],
+  "pk_excluded": ["appointment_pseudo_id"],
+  "known_issues": {
+    "treatment_class_unknown_rate": "14.4% (train) / 14.1% (test) — down from 38.4% after expanding treatment_dict.json from 15 to 22 categories with ~75 aliases; residual unknowns are rare/misspelled strings"
+  },
+  "duration_class_distribution_train": {
+    "15": 58242,
+    "30": 89390,
+    "45": 4450,
+    "60": 12444,
+    "90": 1839,
+    "105": 702
+  }
+}
