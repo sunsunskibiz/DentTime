@@ -8,7 +8,10 @@ import pandas as pd
 from .treatment_mapper import build_reverse_map, load_treatment_dict, map_treatment
 from .tooth_parser import parse_tooth_no
 
-pd.set_option('future.no_silent_downcasting', True)
+try:
+    pd.set_option('future.no_silent_downcasting', True)
+except Exception:
+    pass  # option removed in pandas >=2.2; downcasting is already silent-free by default
 
 def build_treatment_encoding(treatment_dict: dict) -> dict:
     """Deterministic str→int encoding: sorted dict keys → 0…N-1."""

@@ -67,7 +67,7 @@ services:
       --serve-artifacts
       --allowed-hosts '*'
     ports:
-      - "5000:5000"
+      - "5008:5000"
     volumes:
       - mlflow-artifacts:/mlflow/artifacts
     depends_on:
@@ -133,7 +133,7 @@ services:
     profiles: [serving]
     container_name: denttime_api
     ports:
-      - "8000:8000"
+      - "8001:8000"
     volumes:
       - ./data:/app/data
       - ./artifacts:/app/artifacts
@@ -195,7 +195,7 @@ services:
     depends_on:
       - api
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=http://localhost:8001
 
 volumes:
   postgres-db:

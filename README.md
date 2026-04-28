@@ -63,8 +63,8 @@ All services are defined in the root `docker-compose.yml` and activated via prof
 
 | Profile | Make target | Services | Ports |
 |---|---|---|---|
-| `training` | `make up-train` | Airflow, MLflow, Postgres | :8080, :5000 |
-| `serving` | `make up-serve` | Backend, Frontend, Prometheus, Grafana | :8000, :5173, :9090, :3000 |
+| `training` | `make up-train` | Airflow, MLflow, Postgres | :8080, :5008 |
+| `serving` | `make up-serve` | Backend, Frontend, Prometheus, Grafana | :8001, :5173, :9090, :3000 |
 | _(both)_ | `make up` | All of the above | all ports |
 
 ```bash
@@ -147,7 +147,7 @@ features/features_{train,test}.parquet
         └── writes models/model.joblib
 ```
 
-MLflow UI: http://localhost:5000
+MLflow UI: http://localhost:5008
 
 For standalone training without Docker:
 
@@ -167,7 +167,7 @@ make up-serve
 
 | Service | URL |
 |---|---|
-| Backend API docs | http://localhost:8000/docs |
+| Backend API docs | http://localhost:8001/docs |
 | Frontend | http://localhost:5173 |
 | Prometheus | http://localhost:9090 |
 | Grafana | http://localhost:3000 |
