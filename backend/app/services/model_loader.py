@@ -94,5 +94,5 @@ def load_model():
         "model": loaded,
         "feature_cols": FEATURE_COLUMNS,
         "index_to_class": _default_index_to_class(),
-        "model_version": str(MODEL_PATH if MODEL_PATH.exists() else FALLBACK_PATH),
+        "model_version": "dvc" if MODEL_PATH.exists() else "fallback",
     }
