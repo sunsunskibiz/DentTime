@@ -1,9 +1,15 @@
 # ============================================================
-# DentTime — Airflow + MLflow Stack
+# DentTime — Unified Compose
+# Usage:
+#   make up          → start everything (demo)
+#   make up-train    → start Airflow + MLflow only
+#   make up-serve    → start web app + monitoring only
+#   make down        → stop everything
 # ============================================================
+
 x-airflow-common: &airflow-common
   build:
-    context: ..
+    context: .
     dockerfile: docker/Dockerfile.airflow
   env_file:
     - .env
@@ -16,9 +22,9 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     MLFLOW_TRACKING_URI: http://mlflow:5000
   volumes:
-    - ../:/opt/airflow/project
-    - ../airflow/dags:/opt/airflow/dags
-    - ../data/raw:/opt/airflow/data/raw:ro
+    - ./:/opt/airflow/project
+    - ./airflow/dags:/opt/airflow/dags
+    - ./data/raw:/opt/airflow/data/raw:ro
     - denttime-interim:/opt/airflow/data/interim
     - denttime-dvc-store:/opt/airflow/dvc-store
     - mlflow-artifacts:/mlflow/artifacts
@@ -27,17 +33,20 @@ x-airflow-common: &airflow-common
       condition: service_healthy
     mlflow:
       condition: service_healthy
+  profiles: [training]
 
 services:
+  # ── Training profile ───────────────────────────────────────
   postgres:
     image: postgres:15
+    profiles: [training]
     environment:
       POSTGRES_USER: airflow
       POSTGRES_PASSWORD: airflow
       POSTGRES_DB: airflow
     volumes:
       - postgres-db:/var/lib/postgresql/data
-      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "airflow"]
       interval: 5s
@@ -47,7 +56,8 @@ services:
   mlflow:
     build:
       context: .
-      dockerfile: Dockerfile.mlflow
+      dockerfile: docker/Dockerfile.mlflow
+    profiles: [training]
     command: >
       mlflow server
       --host 0.0.0.0
@@ -57,7 +67,7 @@ services:
       --serve-artifacts
       --allowed-hosts '*'
     ports:
-      - "5000:5000"
+      - "5008:5000"
     volumes:
       - mlflow-artifacts:/mlflow/artifacts
     depends_on:
@@ -114,6 +124,78 @@ services:
     depends_on:
       airflow-init:
         condition: service_completed_successfully
+
+  # ── Serving profile ────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    profiles: [serving]
+    container_name: denttime_api
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./data:/app/data
+      - ./artifacts:/app/artifacts
+      - ./src/features/artifacts:/app/src/features/artifacts
+      - ./monitoring:/app/monitoring
+      - denttime-dvc-store:/opt/airflow/dvc-store
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    profiles: [serving]
+    container_name: denttime_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+    depends_on:
+      - api
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    profiles: [serving]
+    container_name: denttime_grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/dashboards:/etc/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+
+  metrics_updater:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    profiles: [serving]
+    container_name: denttime_metrics_updater
+    command: python run_metrics_loop.py
+    volumes:
+      - ./data:/app/data
+      - ./artifacts:/app/artifacts
+      - ./src/features/artifacts:/app/src/features/artifacts
+      - ./monitoring:/app/monitoring
+    depends_on:
+      - api
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    profiles: [serving]
+    container_name: denttime_frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    environment:
+      - VITE_API_URL=http://localhost:8001
 
 volumes:
   postgres-db:

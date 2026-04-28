@@ -1,5 +1,5 @@
 param(
-    [string]$ApiBase = "http://localhost:8000",
+    [string]$ApiBase = "http://localhost:8001",
 
     # This stage is the key for making DentTimeMacroF1Drop become FIRING.
     # It creates labeled examples whose actual class is intentionally different
@@ -232,6 +232,6 @@ if (
 Write-Step "Open these pages for the teacher demo"
 Write-Host "Grafana dashboard : http://localhost:3000/d/denttime-prometheus/denttime-monitoring-dashboard?orgId=1"
 Write-Host "Prometheus alerts : http://localhost:9090/alerts"
-Write-Host "Backend metrics   : http://localhost:8000/metrics"
+Write-Host "Backend metrics   : http://localhost:8001/metrics"
 Write-Host ""
 Write-Host "If Prometheus still shows Pending, wait about 1 minute because the alert rules use 'for: 1m'." -ForegroundColor Yellow
