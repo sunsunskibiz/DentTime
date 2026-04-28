@@ -8,7 +8,7 @@ F1_CRITICAL_TOTAL=130
 F1_ACTUAL_DURATION=45
 UNDER_EST_CRITICAL_TOTAL=40
 UNDER_EST_ACTUAL_DURATION=180
-DELAY_MS=120
+MAX_PARALLEL=20
 SKIP_ACTUAL=false
 
 while [[ $# -gt 0 ]]; do
@@ -23,15 +23,13 @@ while [[ $# -gt 0 ]]; do
         --under-total)       UNDER_EST_CRITICAL_TOTAL="$2"; shift ;;
         --under-actual=*)    UNDER_EST_ACTUAL_DURATION="${1#*=}" ;;
         --under-actual)      UNDER_EST_ACTUAL_DURATION="$2"; shift ;;
-        --delay-ms=*)        DELAY_MS="${1#*=}" ;;
-        --delay-ms)          DELAY_MS="$2"; shift ;;
+        --max-parallel=*)    MAX_PARALLEL="${1#*=}" ;;
+        --max-parallel)      MAX_PARALLEL="$2"; shift ;;
         --skip-actual)       SKIP_ACTUAL=true ;;
         *) echo "Unknown argument: $1" >&2; exit 1 ;;
     esac
     shift
 done
-
-DELAY_SEC=$(python3 -c "print($DELAY_MS / 1000)")
 
 write_step() { echo ""; echo "=== $1 ==="; }
 
@@ -75,28 +73,14 @@ print(f'DentTimeMissingRateHigh    : current={missing:.4f}, threshold > 0.1000, 
 "
 }
 
-# ── scenario batch ────────────────────────────────────────────────────────────
-send_scenario_batch() {
-    local scenario_name="$1"
-    local total="$2"
-    local actual_duration="$3"
-    local minute_offset_base="$4"
-    local clinic_id="$5"
+# ── per-request worker (runs in a background subshell) ───────────────────────
+_send_one() {
+    local i="$1" total="$2" scenario_name="$3" actual_duration="$4" offset="$5" clinic_id="$6" results_dir="$7"
 
-    write_step "$scenario_name"
-    echo "Requests to send       : $total"
-    echo "Actual duration labels : ${actual_duration} minutes"
-    echo "Purpose                : create controlled monitoring degradation for classroom demo"
-    echo ""
+    local selected_dt; selected_dt=$(add_minutes "$offset")
+    local request_time; request_time=$(python3 -c "from datetime import datetime,timezone; print(datetime.now(timezone.utc).isoformat())")
 
-    local success=0 failed=0
-
-    for (( i=1; i<=total; i++ )); do
-        local offset=$(( minute_offset_base + i ))
-        local selected_dt; selected_dt=$(add_minutes "$offset")
-        local request_time; request_time=$(python3 -c "from datetime import datetime,timezone; print(datetime.now(timezone.utc).isoformat())")
-
-        local payload="{\"treatmentSymptoms\":\"UNSEEN_CRITICAL_DEMO_TREATMENT_${scenario_name}_${i}\",\
+    local payload="{\"treatmentSymptoms\":\"UNSEEN_CRITICAL_DEMO_TREATMENT_${scenario_name}_${i}\",\
 \"toothNumbers\":\"11,12,13,14,15,16,17,18,21,22,23,24,25,26,27,28,31,32,33,34,35,36,37,38,41,42,43,44,45,46,47,48\",\
 \"surfaces\":\"M,O,D,B,L\",\
 \"totalAmount\":99999,\
@@ -104,26 +88,50 @@ send_scenario_batch() {
 \"clinicId\":\"${clinic_id}\",\
 \"request_time\":\"${request_time}\"}"
 
-        if result=$(json_post "$API_BASE/predict" "$payload" 2>/dev/null); then
-            success=$(( success + 1 ))
-            predicted=$(parse_field "$result" "['predicted_duration_class']")
-            request_id=$(parse_field "$result" "['request_id']")
-            printf "[%d/%d] OK  predicted=%s minutes, request_id=%s\n" "$i" "$total" "$predicted" "$request_id"
+    if result=$(json_post "$API_BASE/predict" "$payload" 2>/dev/null); then
+        predicted=$(parse_field "$result" "['predicted_duration_class']")
+        request_id=$(parse_field "$result" "['request_id']")
+        printf "[%d/%d] OK  predicted=%s minutes, request_id=%s\n" "$i" "$total" "$predicted" "$request_id"
+        touch "${results_dir}/ok_${i}"
 
-            if [ "$SKIP_ACTUAL" = false ]; then
-                local actual_payload="{\"request_id\":\"${request_id}\",\"actual_duration\":${actual_duration},\"unit\":\"minutes\"}"
-                if actual_result=$(json_post "$API_BASE/actual" "$actual_payload" 2>/dev/null); then
-                    actual_status=$(parse_field "$actual_result" ".get('status','ok')")
-                    printf "        actual logged=%s minutes, status=%s\n" "$actual_duration" "$actual_status"
-                fi
+        if [ "$SKIP_ACTUAL" = false ]; then
+            local actual_payload="{\"request_id\":\"${request_id}\",\"actual_duration\":${actual_duration},\"unit\":\"minutes\"}"
+            if actual_result=$(json_post "$API_BASE/actual" "$actual_payload" 2>/dev/null); then
+                actual_status=$(parse_field "$actual_result" ".get('status','ok')")
+                printf "        actual logged=%s minutes, status=%s\n" "$actual_duration" "$actual_status"
             fi
-        else
-            failed=$(( failed + 1 ))
-            printf "[%d/%d] FAILED\n" "$i" "$total"
         fi
+    else
+        printf "[%d/%d] FAILED\n" "$i" "$total"
+        touch "${results_dir}/fail_${i}"
+    fi
+}
 
-        sleep "$DELAY_SEC"
+# ── scenario batch (parallel) ─────────────────────────────────────────────────
+send_scenario_batch() {
+    local scenario_name="$1" total="$2" actual_duration="$3" minute_offset_base="$4" clinic_id="$5"
+    local results_dir; results_dir=$(mktemp -d)
+
+    write_step "$scenario_name"
+    echo "Requests to send       : $total"
+    echo "Actual duration labels : ${actual_duration} minutes"
+    echo "Max parallel           : $MAX_PARALLEL"
+    echo "Purpose                : create controlled monitoring degradation for classroom demo"
+    echo ""
+
+    for (( i=1; i<=total; i++ )); do
+        # Semaphore: wait until a worker slot is free before launching the next job.
+        while (( $(jobs -rp | wc -l) >= MAX_PARALLEL )); do
+            sleep 0.05
+        done
+        _send_one "$i" "$total" "$scenario_name" "$actual_duration" \
+            $(( minute_offset_base + i )) "$clinic_id" "$results_dir" &
     done
+    wait  # collect all remaining background jobs
+
+    local success; success=$(find "$results_dir" -name "ok_*"   2>/dev/null | wc -l | tr -d ' ')
+    local failed;  failed=$(find  "$results_dir" -name "fail_*" 2>/dev/null | wc -l | tr -d ' ')
+    rm -rf "$results_dir"
 
     echo ""
     echo "Batch succeeded: $success"
@@ -137,6 +145,7 @@ echo "F1 critical batch size        : $F1_CRITICAL_TOTAL"
 echo "F1 critical actual duration   : ${F1_ACTUAL_DURATION} minutes"
 echo "Under-estimation batch size   : $UNDER_EST_CRITICAL_TOTAL"
 echo "Under-estimation actual label : ${UNDER_EST_ACTUAL_DURATION} minutes"
+echo "Max parallel workers          : $MAX_PARALLEL"
 echo "Send /actual labels           : $( [ "$SKIP_ACTUAL" = true ] && echo false || echo true )"
 
 # ── Health check ─────────────────────────────────────────────────────────────

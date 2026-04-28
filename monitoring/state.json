@@ -1,35 +1,32 @@
 {
   "feature_psi": {
-    "treatment_class": 3.7629237498153265,
-    "composite_treatment_flag": 0.29525378202310626,
+    "treatment_class": 10.080979494910089,
+    "composite_treatment_flag": 0.0,
     "has_tooth_no": 10.39775983516138,
-    "tooth_count": 2.304813944302471,
-    "is_area_treatment": 0.27575048302950295,
-    "surface_count": 9.700321351242689,
-    "total_amount": 9.624569076085509,
-    "has_notes": 0.9833450845170064,
-    "appt_day_of_week": 5.948769417967243,
-    "appt_hour_bucket": 13.095767302827387,
-    "is_first_case": 0.3320822229504347,
-    "has_dentist_id": 0.923442521050919,
-    "appointment_rank_in_day": 4.974971053860303,
+    "tooth_count": 13.361648839342422,
+    "is_area_treatment": 0.0,
+    "surface_count": 0.0,
+    "total_amount": 12.408593457284994,
+    "has_notes": 0.0,
+    "appt_day_of_week": 0.0,
+    "appt_hour_bucket": 0.0,
+    "is_first_case": 0.0,
+    "has_dentist_id": 0.0,
+    "appointment_rank_in_day": 0.0,
     "clinic_median_duration": 4.535323109434887,
-    "clinic_pct_long": 11.520296680696799,
-    "doctor_median_duration": 0.7507040005782954,
-    "doctor_pct_long": 2.2258349550160417
+    "clinic_pct_long": 12.443981642430938,
+    "doctor_median_duration": 0.0,
+    "doctor_pct_long": 4.93139190931529
   },
   "prediction_ratio": {
-    "15": 0.013079667063020214,
-    "30": 0.04637336504161712,
-    "60": 0.0011890606420927466,
-    "105": 0.93935790725327
+    "105": 1.0
   },
-  "input_missing_rate": 0.38591885441527446,
-  "treatment_unknown_rate": 0.008353221957040573,
+  "input_missing_rate": 0.4,
+  "treatment_unknown_rate": 0.0,
   "treatment_unknown_rate_baseline": 0.1446605254179461,
   "appt_hour_bucket_sentinel_rate": 0.0,
   "appt_hour_bucket_sentinel_rate_baseline": 0.10691518971430623,
-  "macro_f1": 0.35228848821081826,
-  "mae_minutes": 44.19975031210986,
-  "under_estimation_rate": 0.19975031210986266
+  "macro_f1": 0.23356807511737088,
+  "mae_minutes": 29.26829268292683,
+  "under_estimation_rate": 0.10840108401084012
 }

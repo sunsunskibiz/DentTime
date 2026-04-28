@@ -217,20 +217,26 @@ npm run build   # tsc + vite build
 
 ## Monitoring Demo Scripts
 
-Two scripts simulate monitoring degradation for classroom / grader demos. Both require the serving stack to be running (`make up-serve`, backend at `http://localhost:8000`).
+Three scripts simulate and reset monitoring degradation for classroom / grader demos. All require the serving stack (`make up-serve`, backend at `http://localhost:8001`).
 
-| Script | What it does | Alerts triggered |
+| Script | What it does | Effect |
 |---|---|---|
-| `run_data_diff_demo` | 80 requests with unseen treatments + extreme values | `FeatureDriftHigh`, `MissingRateHigh` |
-| `run_critical_alert_demo` | 170 requests with wrong actual labels in two batches | `MacroF1Drop`, `UnderEstimationHigh` |
+| `reset_alerts.sh` | Clears SQLite predictions, rewrites `monitoring/state.json` to baseline, waits for `metrics_updater` | All alerts resolve to green |
+| `run_data_diff_demo.sh` | 80 parallel requests with unseen treatments + extreme feature values | `FeatureDriftHigh`, `MissingRateHigh`, `MacroF1Drop` |
+| `run_critical_alert_demo.sh` | 170 parallel requests with wrong actual labels in two batches | `MacroF1Drop`, `UnderEstimationHigh`, `MissingRateHigh` |
 
 **macOS / Linux** (requires `curl` and `python3`, both built-in on macOS):
 
 ```bash
-# Data drift demo — PSI > 0.25 on several features
+# 0. Reset to baseline — run this before every demo
+bash scripts/reset_alerts.sh
+
+# 1a. Data drift demo — PSI > 0.25 on several features
 bash scripts/run_data_diff_demo.sh
 
-# Critical alert demo — Macro F1 drop + under-estimation
+# 1b. Critical alert demo — Macro F1 drop + under-estimation
+#     (reset first if switching between demos)
+bash scripts/reset_alerts.sh
 bash scripts/run_critical_alert_demo.sh
 ```
 
@@ -250,6 +256,6 @@ After the script finishes, open:
 |---|---|
 | Grafana dashboard | http://localhost:3000/d/denttime-prometheus/denttime-monitoring-dashboard |
 | Prometheus alerts | http://localhost:9090/alerts |
-| Raw metrics | http://localhost:8000/metrics |
+| Raw metrics | http://localhost:8001/metrics |
 
 > **Note:** If Prometheus shows `Pending` instead of `Firing`, wait ~1 minute — alert rules use `for: 1m`.
