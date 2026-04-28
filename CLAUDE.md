@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-DentTime predicts dental appointment duration (classification into {15, 30, 45, 60, 90, 105} minutes) using an XGBoost model trained on 17 engineered features. The system is split across four independent Docker stacks that must be started separately.
+DentTime predicts dental appointment duration (classification into {15, 30, 45, 60, 90, 105} minutes) using an XGBoost model trained on 17 engineered features. The system uses a unified root `docker-compose.yml` with profiles (`training`, `serving`) that can be started independently or together via `make` targets.
 
 ---
 
@@ -13,7 +13,8 @@ DentTime predicts dental appointment duration (classification into {15, 30, 45, 
 ### Feature Engineering Pipeline (Airflow + MLflow)
 ```bash
 # Start stack (Airflow :8080, MLflow :5000, Postgres)
-cd docker/ && docker compose up --build -d
+make up-train
+# or: docker compose --profile training up --build -d
 
 # Trigger DAG in UI: http://localhost:8080 (admin/admin)
 # After all 7 tasks complete, version the outputs:
@@ -21,7 +22,7 @@ make dvc-commit
 git commit -m "feat: update features $(date +%Y-%m-%d)"
 
 # Stop
-cd docker/ && docker compose down
+make down
 ```
 
 ### Standalone Feature Engineering (no Docker)
@@ -30,16 +31,19 @@ pip install -r requirements-fe.txt
 python feature_engineering.py --input "data/raw/data.csv" --output features/
 ```
 
-### Frontend + Backend (Inference)
+### Frontend + Backend + Monitoring
 ```bash
-docker compose -f docker/compose/frontend-backend.yml up --build
+make up-serve
+# or: docker compose --profile serving up --build -d
 # Backend: http://localhost:8000/docs  Frontend: http://localhost:5173
+# Prometheus: http://localhost:9090    Grafana: http://localhost:3000
 ```
 
-### Monitoring Stack (Prometheus + Grafana)
+### Full Stack (Demo Mode)
 ```bash
-cd Monitoring-Alerting/ && docker compose up --build -d
-# API :8000 | Prometheus :9090 | Grafana :3000 (admin/admin) | Frontend :5173
+make up          # start all stacks
+make down        # stop all stacks
+make validate    # check compose syntax
 ```
 
 ### Standalone Training
@@ -69,16 +73,18 @@ npm run build   # tsc + vite build
 
 ## Architecture
 
-### Four Independent Stacks
+### Unified Compose Profiles
 
-| Stack | Compose file | Purpose |
-|---|---|---|
-| Airflow + MLflow | `docker/docker-compose.yml` | Feature engineering + model retraining |
-| Frontend + Backend | `docker/compose/frontend-backend.yml` | Inference UI + API |
-| Monitoring | `Monitoring-Alerting/docker-compose.yml` | Live monitoring with Prometheus/Grafana |
-| Training | `Trianing/train.py` (standalone) | Ad-hoc model training with MLflow |
+All services are defined in the root `docker-compose.yml` and activated via profiles:
 
-The stacks are not connected at runtime. Artifacts flow through the filesystem: feature pipeline outputs land in `features/` and `src/features/artifacts/`; the retrain DAG writes to `models/`; the inference backend loads from `artifacts/model.joblib`.
+| Profile | Make target | Services | Purpose |
+|---|---|---|---|
+| `training` | `make up-train` | Airflow, MLflow, Postgres | Feature engineering + model retraining |
+| `serving` | `make up-serve` | Backend, Frontend, Prometheus, Grafana | Inference UI + API + monitoring |
+| _(both)_ | `make up` | All of the above | Full stack / demo mode |
+| — | `Trianing/train.py` (standalone) | — | Ad-hoc model training with MLflow |
+
+Artifacts flow through the filesystem: feature pipeline outputs land in `features/` and `src/features/artifacts/`; the retrain DAG writes to `models/`; the inference backend loads from `artifacts/model.joblib`.
 
 ### ML Pipeline (Feature Engineering → Model)
 
