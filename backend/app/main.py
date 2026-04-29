@@ -18,7 +18,16 @@ from src.features.feature_transformer import FEATURE_COLUMNS, FeatureTransformer
 
 import os
 ARTIFACTS_DIR = Path(os.getenv("ARTIFACTS_DIR", "/app/artifacts"))
-RUNTIME_ARTIFACTS_DIR = Path(os.getenv("RUNTIME_ARTIFACTS_DIR", "/app/src/features/artifacts"))
+MODE = os.getenv("APP_MODE", "prod")
+
+if MODE == "demo":
+    RUNTIME_ARTIFACTS_DIR = Path(
+        os.getenv("RUNTIME_ARTIFACTS_DIR_DEMO", "/app/src/features/artifacts/demo")
+    )
+else:
+    RUNTIME_ARTIFACTS_DIR = Path(
+        os.getenv("RUNTIME_ARTIFACTS_DIR", "/app/src/features/artifacts")
+    )
 
 
 class ModelBundle(dict):
