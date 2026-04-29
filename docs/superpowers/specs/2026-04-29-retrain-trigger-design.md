@@ -63,8 +63,11 @@ DentTime/
 │   └── denttime_retrain_dag.py   ← MODIFIED (Dataset schedule + callbacks)
 ├── tests/
 │   ├── test_retrain_trigger.py             ← NEW (unit tests for FastAPI service)
-│   └── dags/
-│       └── test_denttime_await_data_dag.py ← NEW (DAG structure tests)
+│   ├── dags/
+│   │   ├── test_denttime_await_data_dag.py ← NEW (DAG structure tests)
+│   │   └── test_modified_dags.py           ← NEW (Dataset wiring on modified DAGs)
+│   └── integration/
+│       └── test_retrain_trigger_integration.py ← NEW (@pytest.mark.integration, needs stack)
 ├── prometheus/
 │   └── prometheus.yml            ← MODIFIED (add alerting block + evaluation_interval)
 ├── docker-compose.yml            ← MODIFIED (add alertmanager + retrain_trigger to serving profile)
@@ -191,32 +194,55 @@ DAG callbacks use `smtplib` (sync is fine — runs in Airflow worker, not FastAP
 
 ### 4.4 Alertmanager Configuration (`alertmanager/alertmanager.yml`)
 
+All four alert names from `prometheus/alerts.yml` are routed explicitly so the intent is
+unambiguous. Alertmanager evaluates routes top-to-bottom, first-match wins.
+
 ```yaml
 global:
   resolve_timeout: 5m
 
 route:
   group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 5m
   repeat_interval: 4h   # must stay in sync with MIN_RETRAIN_INTERVAL_S=14400
-  receiver: 'retrain-trigger'
+  receiver: 'retrain-trigger'   # fallback; should never be reached with explicit routes below
   routes:
+    # Critical alerts — retrain-worthy, sent to webhook
+    - match: {alertname: DentTimeMacroF1Drop}
+      receiver: 'retrain-trigger'
+    - match: {alertname: DentTimeUnderEstimationHigh}
+      receiver: 'retrain-trigger'
+    # Warning but retrain-worthy — must appear BEFORE the severity:warning catch-all
     - match: {alertname: DentTimeFeatureDriftHigh}
-      receiver: 'retrain-trigger'    # warning but retrain-worthy — explicit before catch-all
-    - match: {severity: warning}
-      receiver: 'null'               # MissingRateHigh — not retrain-worthy
+      receiver: 'retrain-trigger'
+    # Warning and NOT retrain-worthy — silence (data quality issue, retrain won't help)
+    - match: {alertname: DentTimeMissingRateHigh}
+      receiver: 'null'
 
 receivers:
   - name: 'null'
   - name: 'retrain-trigger'
     webhook_configs:
       - url: 'http://retrain_trigger:5001/alert'
-        send_resolved: false
+        send_resolved: false   # resolved notifications are not retrain-worthy
 
 inhibit_rules:
+  # Suppress warning noise when a critical alert is already firing for the same instance.
+  # equal:[] means any active critical silences any warning (all DentTime alerts are distinct names).
   - source_match: {severity: 'critical'}
     target_match: {severity: 'warning'}
     equal: []
 ```
+
+**Alert routing summary:**
+
+| Alert | Severity | Route | Action in `retrain_trigger` |
+|---|---|---|---|
+| `DentTimeMacroF1Drop` | critical | `retrain-trigger` | Retrain-worthy → data gate → pipeline |
+| `DentTimeUnderEstimationHigh` | critical | `retrain-trigger` | Retrain-worthy → data gate → pipeline |
+| `DentTimeFeatureDriftHigh` | warning | `retrain-trigger` | Retrain-worthy → data gate → pipeline |
+| `DentTimeMissingRateHigh` | warning | `null` | Never reaches service (filtered at Alertmanager) — also in `SKIP_ALERTS` as defense-in-depth |
 
 ---
 
@@ -279,12 +305,74 @@ ENGINEER_EMAIL=6870038321@student.chula.ac.th
 
 ## 6. Tests
 
-**`tests/test_retrain_trigger.py`** (unit, no Docker needed):
-- `check_new_data_available()` — all 4 outcomes (True, False, InfrastructureError, features missing)
-- `/alert` — skipped (SKIP_ALERTS), raw_data_missing, waiting, debounced, concurrent lock test, airflow_bad_response, airflow_unreachable
+### 6.1 Unit tests — `tests/test_retrain_trigger.py`
 
-**`tests/dags/test_denttime_await_data_dag.py`** (DAG structure):
-- DAG loads, correct id, 2 tasks, FileSensor with `mode=reschedule` + `timeout=86400`, `on_failure_callback` set
+No Docker needed. Uses `httpx.AsyncClient` with `app` directly (ASGI test client) and `unittest.mock` to patch filesystem + Airflow calls.
+
+**`check_new_data_available()` — 4 cases:**
+- Returns `True` when raw data mtime > features mtime
+- Returns `False` when raw data mtime ≤ features mtime
+- Raises `InfrastructureError` when `RAW_DATA_PATH` does not exist
+- Returns `True` when `FEATURES_PATH` does not exist (features never built)
+
+**`POST /alert` — happy path:**
+- All alerts in `SKIP_ALERTS` → `{"status": "skipped", "reason": "no_retrain_worthy_alerts"}`
+- `RAW_DATA_PATH` missing → `{"status": "skipped", "reason": "raw_data_missing"}` (no email sent)
+- No new data → `{"status": "waiting"}` + email sent (mock `send_email`)
+- New data, first call → `{"status": "triggered", "dag_run_id": "..."}` (mock Airflow)
+- Same call within debounce window → `{"status": "debounced", "retry_in_minutes": N}`
+
+**`POST /alert` — error paths:**
+- `_trigger_dag` raises `httpx.HTTPError` → `{"status": "error", "reason": "airflow_unreachable"}`
+- Airflow returns `{"detail": "DAG not found"}` (no `dag_run_id`) → `{"status": "error", "reason": "airflow_bad_response"}`
+- Feature Engineering polling returns `state == "failed"` → `{"status": "error", "reason": "feature_engineering_failed"}`
+- Feature Engineering polling exhausts 60 iterations → `{"status": "error", "reason": "feature_engineering_timeout"}`
+
+**Concurrency:**
+- Two concurrent `/alert` requests with valid new data: use `asyncio.gather` → exactly one `triggered` and one `debounced` response
+
+**Email content:**
+- WAITING email body contains alert name(s)
+- `state.json` missing → email still sends with "metrics unavailable" note (no exception)
+- `state.json` present → email body contains metric values from file
+
+### 6.2 DAG structure tests — `tests/dags/test_denttime_await_data_dag.py`
+
+No Airflow running needed (import DAG module directly).
+
+- DAG loads without import errors
+- `dag_id == "denttime_await_data"`
+- `schedule is None`
+- `max_active_runs == 1`
+- Task count == 2: `wait_for_raw_data`, `trigger_feature_engineering`
+- `wait_for_raw_data` is a `FileSensor` with `mode="reschedule"` and `timeout=86400`
+- `on_failure_callback` is set on the DAG
+
+### 6.3 DAG structure tests — `tests/dags/test_modified_dags.py`
+
+Verify Dataset wiring on modified DAGs:
+
+- `feature_engineering_dag` has `schedule == [RAW_DATA]`
+- `feature_engineering_dag` has `max_active_runs == 1`
+- `task_transform_train` has `outlets` containing `FEATURES_TRAIN`
+- `denttime_retrain_dag` has `schedule == [FEATURES_TRAIN]`
+- `denttime_retrain_dag` has `on_success_callback` set
+- `denttime_retrain_dag` has `on_failure_callback` set
+
+### 6.4 Integration tests — `tests/integration/test_retrain_trigger_integration.py`
+
+Marked `@pytest.mark.integration` — skipped unless stack is running. Run with:
+```bash
+pytest tests/integration/ -m integration -v
+```
+
+These tests hit `http://localhost:5001` directly (the real running container):
+
+- `GET /health` → `{"status": "ok"}` with HTTP 200
+- `POST /alert` with `DentTimeMissingRateHigh` only → `{"status": "skipped"}`
+- `POST /alert` with `DentTimeMacroF1Drop`, Airflow unreachable → `{"status": "error"}` (run when Airflow stack is down)
+- `POST /alert` with `DentTimeMacroF1Drop`, valid stack → `{"status": "triggered"}` OR `"debounced"` (either is correct depending on timing)
+- Second identical POST within 1 s → `{"status": "debounced"}` (verifies debounce in real process state)
 
 ---
 
