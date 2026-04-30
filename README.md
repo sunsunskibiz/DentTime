@@ -2,6 +2,8 @@
 
 DentTime predicts dental appointment duration (classification into {15, 30, 45, 60, 75, 90, 105} minutes) using an XGBoost model trained on 17 engineered features.
 
+> 📊 **Presentation:** For a comprehensive overview of the project architecture, design decisions, and final results, please check out our [Final Presentation](report/presentation/DentTime-final.odp).
+
 ---
 
 ## Project Structure
