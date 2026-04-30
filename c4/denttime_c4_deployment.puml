@@ -1,0 +1,71 @@
+@startuml denttime_c4_deployment
+!include lib/C4_Deployment.puml
+
+LAYOUT_WITH_LEGEND()
+
+title [Deployment Diagram] DentTime — Future Production Target (GKE Autopilot)
+
+' ===== External: Clinic Management System =====
+Deployment_Node(nodeCms, "Clinic Management System", "MySQL / PostgreSQL") {
+    Container(cmsDb, "Appointment DB", "MySQL / PostgreSQL", "Historical appointment and treatment records (~1M rows).")
+}
+
+' ===== Google Cloud Storage =====
+Deployment_Node(nodeGcs, "Google Cloud Storage", "GCS Bucket: denttime-models") {
+    Node(gcsArtifacts, "Model Artifacts Store", "ONNX format", "Versioned ONNX model files. Retains last 2 versions.")
+}
+
+' ===== External: Clinic Staff Browser =====
+Deployment_Node(nodeBrowser, "Clinic Staff's Browser", "Web Browser") {
+    Container(browserApp, "DentTime Web App", "React 19 + Vite", "Booking UI — fills symptoms, views predicted duration slot.")
+}
+
+' ===== GKE Autopilot Cluster =====
+Deployment_Node(nodeGke, "GKE Autopilot Cluster", "Google Kubernetes Engine Autopilot") {
+
+    ' ── Training Namespace ──────────────────────────────
+    Deployment_Node(nsTraining, "denttime-training", "Kubernetes Namespace") {
+        Container(postgres, "PostgreSQL 15", "PostgreSQL 15", "Airflow metadata + MLflow backend store.")
+        Container(mlflow, "MLflow Tracking Server", "MLflow 2.x", "Experiment tracking and model registry.")
+        Container(airflowWeb, "Airflow Webserver", "Apache Airflow 2.x", "DAG trigger UI on :8080.")
+        Container(airflowSched, "Airflow Scheduler", "Apache Airflow 2.x", "Runs feature_engineering_dag and denttime_retrain_dag.")
+    }
+
+    ' ── Serving Namespace ───────────────────────────────
+    Deployment_Node(nsServing, "denttime-serving", "Kubernetes Namespace") {
+        Node(istio, "Istio Ingress Gateway", "Istio / Envoy", "TLS termination, load balancing, request mirroring.")
+        Container(router, "Traffic Router", "KServe Traffic Splitting", "Canary rollout: Shadow → 10% canary → 100% prod.")
+        Container(tritonProd, "Triton Prod", "NVIDIA Triton + ONNX Runtime", "Serves production model. p99 < 1s. Hot-reload.")
+        Container(tritonShadow, "Triton Shadow", "NVIDIA Triton + ONNX Runtime", "Mirrors requests silently for candidate evaluation.")
+        Container(evalLogger, "Evaluation Logger", "Python / Prometheus client", "Compares prod vs shadow. Tracks F1, MAE, PSI.")
+        Container(grafana, "Grafana", "Grafana 11.x", "Monitoring dashboards: drift, latency, F1 trend.")
+        Node(hpa, "KPA / HPA Auto-Scaler", "KServe KPA + K8s HPA", "Scales triton-prod to maintain p99 < 1s.")
+    }
+}
+
+' ===== Training Pipeline (offline / batch) =====
+Rel(cmsDb, airflowSched, "Raw appointment records", "SQL / CSV")
+Rel(airflowSched, postgres, "Airflow metadata", "SQL")
+Rel(airflowWeb, postgres, "DAG state & run metadata", "SQL")
+Rel(airflowSched, mlflow, "Log experiments & metrics", "MLflow API")
+Rel(mlflow, postgres, "Backend store", "SQL")
+Rel(mlflow, gcsArtifacts, "Publish approved ONNX model", "GCS API")
+
+' ===== Serving Pipeline (online / on-demand) =====
+Rel(browserApp, istio, "POST /predict", "HTTPS / JSON")
+Rel(istio, router, "Forward inference request", "gRPC")
+Rel(istio, tritonShadow, "Mirror request (silent copy)", "gRPC")
+Rel(router, tritonProd, "Route production traffic", "gRPC")
+Rel(istio, browserApp, "Duration slot response (15-105 min)", "HTTPS / JSON")
+Rel(gcsArtifacts, tritonProd, "Hot-reload ONNX model", "GCS API")
+Rel(gcsArtifacts, tritonShadow, "Hot-reload ONNX model", "GCS API")
+
+' ===== Monitoring & Feedback Loop =====
+Rel(evalLogger, tritonProd, "Scrape production metrics", "Prometheus")
+Rel(evalLogger, tritonShadow, "Scrape shadow metrics", "Prometheus")
+Rel(evalLogger, router, "Promote / rollback signal", "Internal API")
+Rel(tritonProd, hpa, "Resource utilization metrics", "K8s Metrics API")
+Rel(hpa, nodeGke, "Request additional compute nodes", "GKE API")
+Rel(grafana, evalLogger, "Query metrics", "Prometheus HTTP")
+
+@enduml
