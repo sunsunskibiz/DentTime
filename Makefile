@@ -27,7 +27,7 @@ up-serve: ## Start web app + monitoring stack
 	docker compose --profile serving up -d
 
 down: ## Stop all containers
-	docker compose down
+	docker compose --profile training --profile serving down
 
 validate: ## Check compose file syntax
 	docker compose config --quiet && echo "Compose config OK"
