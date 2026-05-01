@@ -6,6 +6,34 @@ DentTime predicts dental appointment duration (classification into {15, 30, 45, 
 
 ---
 
+## Architecture Overview
+
+### System Context
+
+```mermaid
+C4Context
+    title DentTime — System Context
+    Person(clinicStaff, "Clinic Staff", "Books appointments and fills patient symptoms to schedule appointments")
+    Person_Ext(dentist, "Dentist", "Reviews balanced schedule and benefits from accurate time slots")
+    Person_Ext(clinicAdmin, "Clinic Admin", "Monitors scheduling efficiency and resource utilization")
+    System(denttime, "DentTime System", "Predicts appointment duration via XGBoost. Classifies into 7 slots: 15/30/45/60/75/90/105 min. p99 < 1s.")
+    System_Ext(cms, "Clinic Management System", "Source of historical appointment and treatment records (~1M rows)")
+    System_Ext(gcs, "Google Cloud Storage", "Stores versioned ML model artifacts")
+    System_Ext(gke, "GKE Autopilot", "Managed Kubernetes platform for production deployment")
+    Rel(clinicStaff, denttime, "Fills symptoms, receives predicted time window", "HTTPS")
+    Rel(dentist, denttime, "Views scheduled slots and workload summary", "HTTPS")
+    Rel(clinicAdmin, denttime, "Monitors performance metrics", "HTTPS")
+    Rel(cms, denttime, "Provides training records", "SQL / CSV Export")
+    Rel(denttime, gcs, "Loads and updates versioned model artifacts", "GCS API")
+    Rel(denttime, gke, "Deployed and auto-scaled on", "Kubernetes")
+```
+
+### CI/CD Pipeline
+
+![DentTime CI/CD Pipeline](c4/denttime_cicd_simplified_v2.svg)
+
+---
+
 ## Project Structure
 
 ```
